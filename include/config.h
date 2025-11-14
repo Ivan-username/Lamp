@@ -23,7 +23,7 @@ uint8_t currentModeID = 0;
 #define LED_NUM (WIDTH * HEIGHT)
 #define SEGMENTS 1
 #define MATRIX_TYPE 0      // 0-змейка 1-рядками
-#define CONNECTION_ANGLE 1 // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
+#define CONNECTION_ANGLE 0 // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
 #define STRIP_DIRECTION 0  // направление ленты из угла: 0 - вправо, 1 - вверх, 2 - влево, 3 - вниз
 
 boolean effectSlowStart = true;
