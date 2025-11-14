@@ -2,8 +2,9 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
-#include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
+#include <WebSocketsServer.h>
+#include <ESP8266WebServer.h>
 
 // WiFi configuration
 const char *ssid = "keenuka";
@@ -29,11 +30,12 @@ boolean effectSlowStart = true;
 
 struct
 {
-    byte brightness = 100;
+    byte brightness = 50;
     byte speed = 30;
     byte scale = 40;
 } modes[MODE_AMOUNT];
 
 // Global variables
 CRGB leds[LED_NUM];
-ESP8266WebServer server(SERVER_PORT);
+WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
+ESP8266WebServer server(80);                       // HTTP сервер на порту 80

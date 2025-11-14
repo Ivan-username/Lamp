@@ -21,13 +21,14 @@ void setup()
   setupWiFi();
 
   // sevver setup
-  setupServer();
+  setupHttpServer();
+  setupWebsocketServer();
 }
 
 void loop()
 {
-
-  serverTick();
+  server.handleClient();
+  webSocket.loop();
 
   effectsTick();
 }
