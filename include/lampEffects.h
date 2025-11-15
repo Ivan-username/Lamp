@@ -11,7 +11,7 @@ void ledsSetup()
     FastLED.setBrightness(modes[0].brightness);
     FastLED.clear(true);
 }
-//================= Off =================// 0
+//================= Off =================//
 void offRoutine()
 {
     fillAll(CRGB::Black);
@@ -156,4 +156,20 @@ void fireRoutine()
     }
     drawFrame(pcnt);
     pcnt += 30;
+}
+
+//================= Lava =================// 2
+void lavaNoise()
+{
+    if (effectSlowStart)
+    {
+        effectSlowStart = false;
+        currentPalette = LavaColors_p;
+
+        colorLoop = 0;
+    }
+
+    scale = modes[currentModeID].scale;
+    speed = modes[currentModeID].speed;
+    fillNoiseLED();
 }

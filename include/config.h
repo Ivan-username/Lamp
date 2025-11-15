@@ -26,6 +26,13 @@ uint8_t currentModeID = 0;
 #define CONNECTION_ANGLE 0 // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
 #define STRIP_DIRECTION 0  // направление ленты из угла: 0 - вправо, 1 - вверх, 2 - влево, 3 - вниз
 
+#define MAX_DIMENSION (max(WIDTH, HEIGHT))
+#if (WIDTH > HEIGHT)
+uint8_t noise[WIDTH][WIDTH];
+#else
+uint8_t noise[HEIGHT][HEIGHT];
+#endif
+
 boolean effectSlowStart = true;
 
 struct
@@ -36,6 +43,8 @@ struct
 } modes[MODE_AMOUNT];
 
 // Global variables
+
+boolean isOn = false;
 CRGB leds[LED_NUM];
 WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80
