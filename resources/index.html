@@ -7,27 +7,40 @@
 <body>
     <h1>LED Control</h1>
     
-    <button id="btn"></button>
+    <button id="btn">Switch</button>
     
     <br>
 
-    <li>
+    <ul id="modeList">
         <li id="lamp">lamp</li>
         <li id="fire">fire</li>
         <li id="lava">lava</li>
-    </li>
+    </ul>
     <br>
     
     <div>
         Brightness: <span id="brightnessValue"></span>
     </div>
-    <input type="range" min="5" max="255" value="%BRIGHTNESS%" id="brightnessSlider">
+    <input type="range" min="1" max="255" id="brightnessSlider">
     <br>
     <div>
         Scale: <span id="scaleValue"></span>
     </div>
-    <input type="range" min="0" max="255" value="%SCALE%" id="scaleSlider">
+    <input type="range" min="0" max="255" id="scaleSlider">
+    <br>
+    <div>
+        Speed: <span id="speedValue"></span>
+    </div>
+    <input type="range" min="1" max="50" id="speedSlider">
     
+    <hr>
+
+    <form  id="wifiForm">
+    <input type="text" required id="wifiName">
+    <input type="text" required id="wifiPassword">
+    <button id="setupWifi">Cofirm</button>
+</form>
+
     <div id="connectionStatus">
         Connecting...
     </div>
@@ -36,6 +49,7 @@
         var socket = new WebSocket('ws://' + window.location.hostname + ':81/');
         const btn = document.getElementById('btn');
 
+        const modeList = document.getElementById('modeList');
         const lamp = document.getElementById('lamp');
         const fire = document.getElementById('fire');
         const lava = document.getElementById('lava');
@@ -43,9 +57,15 @@
 
         const brightnessSlider = document.getElementById('brightnessSlider');
         const scaleSlider = document.getElementById('scaleSlider');
+        const speedSlider = document.getElementById('speedSlider');
 
         const brightnessValue = document.getElementById('brightnessValue');
         const scaleValue = document.getElementById('scaleValue');
+        const speedValue = document.getElementById('speedValue');
+
+        const wifiName = document.getElementById('wifiName');
+        const wifiPassword = document.getElementById('wifiPassword');
+        const setupWifi = document.getElementById('setupWifi');
 
         const connectionStatus = document.getElementById('connectionStatus');
 
@@ -66,7 +86,6 @@
             console.log('event:' + event.data);
             if (event.data.startsWith('state:')) {
                 const state = event.data.substring(6);
-                updateButtonState(state === 'on');
             }
             else if (event.data.startsWith('brightness:')) {
                 const brightness = event.data.substring(11);
@@ -78,15 +97,12 @@
                 scaleValue.innerText = scale;
                 scaleSlider.value = scale;
             }
-        };
-
-        function updateButtonState(isOn) {
-            if (isOn) {
-                btn.innerText = 'TURN OFF';
-            } else {
-                btn.innerText = 'TURN ON';
+            else if (event.data.startsWith('speed:')) {
+                const speed = event.data.substring(6);
+                speedValue.innerText = speed;
+                speedSlider.value = speed;
             }
-        }
+        };
 
         //elems events
         btn.onclick = function() {
@@ -94,19 +110,20 @@
             console.log('state');
         }
 
-        lamp.onclick = function() {
-            socket.send('mode:0');
-            console.log('mode:0');
+        modeList.onclick = function(event) {
+            if (event.target.tagName === 'LI') {
+                const modeIndex = Array.from(modeList.children).indexOf(event.target);
+                socket.send('mode:' + modeIndex);
+                console.log('mode:' + modeIndex);
+            }
         }
 
-        fire.onclick = function() {
-            socket.send('mode:1');
-            console.log('mode:1');
-        }
 
-        lava.onclick = function() {
-            socket.send('mode:2');
-            console.log('mode:2');
+        setupWifi.onclick = function() {
+            const ssid = wifiName.value;
+            const password = wifiPassword.value;
+            socket.send('wifi:' + ssid + ',' + password);
+            console.log('wifi:' + ssid + ',' + password);
         }
 
         brightnessSlider.oninput = function() {
@@ -119,6 +136,12 @@
             scaleValue.innerText = this.value;
             socket.send('scale:' + this.value);
             console.log('scale:' + this.value);
+        }
+
+        speedSlider.oninput = function() {
+            speedValue.innerText = this.value;
+            socket.send('speed:' + this.value);
+            console.log('speed:' + this.value);
         }
     </script>
 </body>

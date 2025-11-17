@@ -5,10 +5,11 @@
 #include <ESP8266WiFi.h>
 #include <WebSocketsServer.h>
 #include <ESP8266WebServer.h>
+#include <FileData.h>
+#include <LittleFS.h>
 
-// WiFi configuration
-const char *ssid = "keenuka";
-const char *password = "ZreTHEA44";
+const char *APssid = "Lamp";
+const char *APpassword = "12345678";
 
 // Server configuration
 #define SERVER_PORT 80
@@ -33,8 +34,18 @@ uint8_t noise[WIDTH][WIDTH];
 uint8_t noise[HEIGHT][HEIGHT];
 #endif
 
-boolean effectSlowStart = true;
+// Configuration structure
+struct Config
+{
+    uint8_t wifiMode = 0; // 0 - Router, 1 - Access Point
+    String STAssid = "keenuka";
+    String STApassword = "ZreTHEA43";
+};
+Config config;
 
+FileData data(&LittleFS, "/data.dat", 'A', &config, sizeof(config));
+
+// Global variables
 struct
 {
     byte brightness = 50;
@@ -42,9 +53,10 @@ struct
     byte scale = 40;
 } modes[MODE_AMOUNT];
 
-// Global variables
-
+boolean effectSlowStart = true;
 boolean isOn = false;
+
+// Objects
 CRGB leds[LED_NUM];
 WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80

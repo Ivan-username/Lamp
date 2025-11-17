@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.h"
+#include "lampWiFi.h"
 
 String getHTML()
 {
@@ -14,27 +15,41 @@ String getHTML()
 <body>
     <h1>LED Control</h1>
     
-    <button id="btn"></button>
+    <button id="btn">Switch</button>
     
     <br>
 
-    <li>
+    <ul id="modeList">
         <li id="lamp">lamp</li>
         <li id="fire">fire</li>
         <li id="lava">lava</li>
-    </li>
+    </ul>
     <br>
     
     <div>
         Brightness: <span id="brightnessValue"></span>
     </div>
-    <input type="range" min="5" max="255" value="%BRIGHTNESS%" id="brightnessSlider">
+    <input type="range" min="1" max="255" id="brightnessSlider">
     <br>
     <div>
         Scale: <span id="scaleValue"></span>
     </div>
-    <input type="range" min="0" max="255" value="%SCALE%" id="scaleSlider">
+    <input type="range" min="0" max="255" id="scaleSlider">
+
+    <br>
+    <div>
+        Speed: <span id="speedValue"></span>
+    </div>
+    <input type="range" min="1" max="50" id="speedSlider">
     
+    <hr>
+
+    <form  id="wifiForm">
+    <input type="text" required id="wifiName">
+    <input type="text" required id="wifiPassword">
+    <button id="setupWifi">Cofirm</button>
+</form>
+
     <div id="connectionStatus">
         Connecting...
     </div>
@@ -43,6 +58,7 @@ String getHTML()
         var socket = new WebSocket('ws://' + window.location.hostname + ':81/');
         const btn = document.getElementById('btn');
 
+        const modeList = document.getElementById('modeList');
         const lamp = document.getElementById('lamp');
         const fire = document.getElementById('fire');
         const lava = document.getElementById('lava');
@@ -50,9 +66,15 @@ String getHTML()
 
         const brightnessSlider = document.getElementById('brightnessSlider');
         const scaleSlider = document.getElementById('scaleSlider');
+        const speedSlider = document.getElementById('speedSlider');
 
         const brightnessValue = document.getElementById('brightnessValue');
         const scaleValue = document.getElementById('scaleValue');
+        const speedValue = document.getElementById('speedValue');
+
+        const wifiName = document.getElementById('wifiName');
+        const wifiPassword = document.getElementById('wifiPassword');
+        const setupWifi = document.getElementById('setupWifi');
 
         const connectionStatus = document.getElementById('connectionStatus');
 
@@ -73,7 +95,6 @@ String getHTML()
             console.log('event:' + event.data);
             if (event.data.startsWith('state:')) {
                 const state = event.data.substring(6);
-                updateButtonState(state === 'on');
             }
             else if (event.data.startsWith('brightness:')) {
                 const brightness = event.data.substring(11);
@@ -85,15 +106,12 @@ String getHTML()
                 scaleValue.innerText = scale;
                 scaleSlider.value = scale;
             }
-        };
-
-        function updateButtonState(isOn) {
-            if (isOn) {
-                btn.innerText = 'TURN OFF';
-            } else {
-                btn.innerText = 'TURN ON';
+            else if (event.data.startsWith('speed:')) {
+                const speed = event.data.substring(6);
+                speedValue.innerText = speed;
+                speedSlider.value = speed;
             }
-        }
+        };
 
         //elems events
         btn.onclick = function() {
@@ -101,19 +119,20 @@ String getHTML()
             console.log('state');
         }
 
-        lamp.onclick = function() {
-            socket.send('mode:0');
-            console.log('mode:0');
+        modeList.onclick = function(event) {
+            if (event.target.tagName === 'LI') {
+                const modeIndex = Array.from(modeList.children).indexOf(event.target);
+                socket.send('mode:' + modeIndex);
+                console.log('mode:' + modeIndex);
+            }
         }
 
-        fire.onclick = function() {
-            socket.send('mode:1');
-            console.log('mode:1');
-        }
 
-        lava.onclick = function() {
-            socket.send('mode:2');
-            console.log('mode:2');
+        setupWifi.onclick = function() {
+            const ssid = wifiName.value;
+            const password = wifiPassword.value;
+            socket.send('wifi:' + ssid + ',' + password);
+            console.log('wifi:' + ssid + ',' + password);
         }
 
         brightnessSlider.oninput = function() {
@@ -126,6 +145,12 @@ String getHTML()
             scaleValue.innerText = this.value;
             socket.send('scale:' + this.value);
             console.log('scale:' + this.value);
+        }
+
+        speedSlider.oninput = function() {
+            speedValue.innerText = this.value;
+            socket.send('speed:' + this.value);
+            console.log('speed:' + this.value);
         }
     </script>
 </body>
@@ -154,6 +179,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         webSocket.sendTXT(num, isOn ? "state:on" : "state:off");
         webSocket.sendTXT(num, ("brightness:" + String(modes[currentModeID].brightness)).c_str());
         webSocket.sendTXT(num, ("scale:" + String(modes[currentModeID].scale)).c_str());
+        webSocket.sendTXT(num, ("speed:" + String(modes[currentModeID].speed)).c_str());
     }
     break;
     case WStype_TEXT:
@@ -163,7 +189,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         {
             isOn = !isOn;
             effectSlowStart = true;
-            Serial.println(isOn);
+            Serial.println("State: " + isOn ? "On" : "Off");
         }
         else if (String((char *)payload).startsWith("mode:"))
         {
@@ -172,30 +198,47 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             effectSlowStart = true;
             webSocket.sendTXT(num, ("brightness:" + String(modes[currentModeID].brightness)).c_str());
             webSocket.sendTXT(num, ("scale:" + String(modes[currentModeID].scale)).c_str());
-            Serial.println(val);
+            webSocket.sendTXT(num, ("speed:" + String(modes[currentModeID].speed)).c_str());
+            Serial.println("Mode: " + val);
         }
         else if (String((char *)payload).startsWith("brightness:"))
         {
             String val = String((char *)payload).substring(11);
             modes[currentModeID].brightness = val.toInt();
-            Serial.println(val);
+            Serial.println("Brightness: " + val);
         }
         else if (String((char *)payload).startsWith("scale:"))
         {
             String val = String((char *)payload).substring(6);
             modes[currentModeID].scale = val.toInt();
-            Serial.println(val);
+            Serial.println("Scale: " + val);
+        }
+        else if (String((char *)payload).startsWith("speed:"))
+        {
+            String val = String((char *)payload).substring(6);
+            modes[currentModeID].speed = val.toInt();
+            Serial.println("Speed: " + val);
+        }
+        else if (String((char *)payload).startsWith("wifi:"))
+        {
+            String val = String((char *)payload).substring(5);
+            int separatorIndex = val.indexOf(",");
+            String ssid = val.substring(0, separatorIndex);
+            String password = val.substring(separatorIndex + 1);
+
+            config.wifiMode = 0;
+            config.STAssid = ssid;
+            config.STApassword = password;
+            data.updateNow();
+            delay(1000);
+            ESP.restart();
+            Serial.println("Recived new wifi config:" + ssid + ":" + password);
         }
         break;
     }
-    case WStype_BIN:
+    default:
     {
-        Serial.printf("[%u] Received binary data of length: %u\n", num, length);
-        break;
-    }
-    case WStype_ERROR:
-    {
-        Serial.printf("[%u] Error occurred\n", num);
+        Serial.println("WebSocket type received: " + String(type));
         break;
     }
     }
@@ -203,14 +246,18 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
 void setupHttpServer()
 {
+
     server.on("/", handlerRoot);
     server.begin();
+    delay(1000);
     Serial.println("HTTP server started.");
 }
 
 void setupWebsocketServer()
 {
+
     webSocket.begin();
     webSocket.onEvent(webSocketEvent);
+    delay(1000);
     Serial.println("WebSocket server started.");
 }

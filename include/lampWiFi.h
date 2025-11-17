@@ -4,9 +4,26 @@
 
 static byte reconnectionTries = 10;
 
-void setupWiFi()
+IPAddress local_ip(192, 168, 4, 1);
+IPAddress gateway(192, 168, 4, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+void setupAPMode()
 {
-    WiFi.begin(ssid, password);
+
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(APssid, APpassword);
+    WiFi.softAPConfig(local_ip, gateway, subnet);
+
+    Serial.print("Access Point IP address: ");
+    Serial.println(WiFi.softAPIP());
+    delay(1000);
+}
+
+void setupSTAMode()
+{
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(config.STAssid, config.STApassword);
 
     while (--reconnectionTries && WiFi.status() != WL_CONNECTED)
     {
@@ -15,13 +32,24 @@ void setupWiFi()
     }
     if (WiFi.status() == WL_CONNECTED)
     {
-        // Иначе удалось подключиться отправляем сообщение
-        Serial.println("IP address: ");
-        Serial.print(WiFi.localIP());
-        digitalWrite(LED_BUILTIN, 0);
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
     }
     else
     {
-        Serial.println("Non Connecting to WiFi..");
+        WiFi.disconnect();
+        setupAPMode();
+    }
+}
+
+void setupWiFi()
+{
+    if (config.wifiMode == 0)
+    {
+        setupSTAMode();
+    }
+    else
+    {
+        setupAPMode();
     }
 }
