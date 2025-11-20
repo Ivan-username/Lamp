@@ -27,6 +27,9 @@ void effectsTick()
 
             switch (currentModeID)
             {
+            case 0:
+                lampRoutine();
+                break;
             case 1:
                 fireRoutine();
                 break;

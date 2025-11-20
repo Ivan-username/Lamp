@@ -104,7 +104,7 @@ void drawPixelXY(int8_t x, int8_t y, CRGB color)
 
 //================= For noise effects =================//
 
-CRGBPalette16 currentPalette(PartyColors_p);
+CRGBPalette16 currentPalette;
 uint8_t colorLoop = 1;
 uint8_t ihue = 0;
 

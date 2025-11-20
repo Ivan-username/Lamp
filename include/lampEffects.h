@@ -17,6 +17,15 @@ void offRoutine()
     fillAll(CRGB::Black);
 }
 
+//================= Lamp =================// 0
+void lampRoutine()
+{
+    if (effectSlowStart)
+    {
+        effectSlowStart = false;
+    }
+    fillAll(CRGB::White);
+}
 //================= Fire =================// 1
 #define SPARKLES 1 // вылетающие угольки вкл выкл
 unsigned char line[WIDTH];

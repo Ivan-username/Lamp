@@ -1,148 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>LED Control</title>
+    <title>Lamp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>LED Control</h1>
+
+    <h1>Lamp</h1>
     
-    <button id="btn">Switch</button>
-    
-    <br>
+    <div class="settings" id="settings">
 
-    <ul id="modeList">
-        <li id="lamp">lamp</li>
-        <li id="fire">fire</li>
-        <li id="lava">lava</li>
-    </ul>
-    <br>
-    
-    <div>
-        Brightness: <span id="brightnessValue"></span>
+        <div class="connectionStatus">
+
+        </div>
+<hr>
+        <div class="modes" id="modes">
+            <div class="mode" id="lamp">lamp</div>
+            <div class="mode" id="fire">fire</div>
+            <div class="mode" id="lava">lava</div>
+        </div>
+
+        <hr>
+
+            <div class="slider-container">
+                <div class="slider-info">
+                    <span class="slider-name" id="slider-name">Brightness:</span>
+                    <span id="brightness-value"></span>
+                </div>
+                <input type="range" min="1" max="255" id="slider-brightness" class="slider">
+            </div>
+<hr>
+            <div class="slider-container">
+                <div class="slider-info">
+                    <span class="slider-name" id="slider-name">Scale:</span>
+                    <span id="scale-value"></span>
+                </div>
+                <input type="range" min="1" max="255" id="slider-scale" class="slider">
+            </div>
+<hr>
+            <div class="slider-container">
+                <div class="slider-info">
+                    <span class="slider-name" id="slider-name">Speed:</span>
+                    <span id="speed-value"></span>
+                </div>
+                <input type="range" min="1" max="50" id="slider-speed" class="slider">
+            </div>
+
+        <hr>
+
+        <div class="div-button" id="onoff-button">
+            <span class="onoff-text" id="onoff-text">Switch
+        </div>
     </div>
-    <input type="range" min="1" max="255" id="brightnessSlider">
-    <br>
-    <div>
-        Scale: <span id="scaleValue"></span>
+
+    <div class="settings">
+        
+        <div class="div-button" id="options-button">
+            <span class="options-text" id="options-text">Options</span>
+        </div>
+
+        <div id="options" class="options">
+            <hr>
+            <div class="wifi-sta" id="wifi-sta">
+                <div class="sta-container">
+                    <div class="sta-name">
+                        <span>Name:</span>
+                        <input class="sta-input" type="text" required placeholder="..." id="wifiName">
+                    </div>
+                    <div class="sta-password">
+                        <span>Pass:</span>
+                        <input class="sta-input" type="text" required password placeholder="..." id="wifiPassword">
+                    </div>
+                </div>
+                <div class="div-button" id="sta-button">
+                    <span class="sta-text" id="sta-text">Set new WiFi</span>
+                </div>
+            </div>
+            <hr>
+            <div class="wifi-ap" id="wifi-ap">
+                <div class="div-button" id="ap-button">
+                    <span class="ap-text" id="ap-text">Switch to AP Mode</span>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <input type="range" min="0" max="255" id="scaleSlider">
-    <br>
-    <div>
-        Speed: <span id="speedValue"></span>
-    </div>
-    <input type="range" min="1" max="50" id="speedSlider">
-    
-    <hr>
-
-    <form  id="wifiForm">
-    <input type="text" required id="wifiName">
-    <input type="text" required id="wifiPassword">
-    <button id="setupWifi">Cofirm</button>
-</form>
-
-    <div id="connectionStatus">
-        Connecting...
-    </div>
-
-    <script>
-        var socket = new WebSocket('ws://' + window.location.hostname + ':81/');
-        const btn = document.getElementById('btn');
-
-        const modeList = document.getElementById('modeList');
-        const lamp = document.getElementById('lamp');
-        const fire = document.getElementById('fire');
-        const lava = document.getElementById('lava');
-
-
-        const brightnessSlider = document.getElementById('brightnessSlider');
-        const scaleSlider = document.getElementById('scaleSlider');
-        const speedSlider = document.getElementById('speedSlider');
-
-        const brightnessValue = document.getElementById('brightnessValue');
-        const scaleValue = document.getElementById('scaleValue');
-        const speedValue = document.getElementById('speedValue');
-
-        const wifiName = document.getElementById('wifiName');
-        const wifiPassword = document.getElementById('wifiPassword');
-        const setupWifi = document.getElementById('setupWifi');
-
-        const connectionStatus = document.getElementById('connectionStatus');
-
-        //socket events
-        socket.onopen = function(e) {
-            connectionStatus.innerHTML = 'Connected';
-        };
-
-        socket.onclose = function(e) {
-            connectionStatus.innerHTML = 'Disconnected';
-        };
-
-        socket.onerror = function(e) {
-            connectionStatus.innerHTML = 'Connection error';
-        };
-
-        socket.onmessage = function(event) {
-            console.log('event:' + event.data);
-            if (event.data.startsWith('state:')) {
-                const state = event.data.substring(6);
-            }
-            else if (event.data.startsWith('brightness:')) {
-                const brightness = event.data.substring(11);
-                brightnessValue.innerText = brightness;
-                brightnessSlider.value = brightness;
-            }
-            else if (event.data.startsWith('scale:')) {
-                const scale = event.data.substring(6);
-                scaleValue.innerText = scale;
-                scaleSlider.value = scale;
-            }
-            else if (event.data.startsWith('speed:')) {
-                const speed = event.data.substring(6);
-                speedValue.innerText = speed;
-                speedSlider.value = speed;
-            }
-        };
-
-        //elems events
-        btn.onclick = function() {
-            socket.send('state');
-            console.log('state');
-        }
-
-        modeList.onclick = function(event) {
-            if (event.target.tagName === 'LI') {
-                const modeIndex = Array.from(modeList.children).indexOf(event.target);
-                socket.send('mode:' + modeIndex);
-                console.log('mode:' + modeIndex);
-            }
-        }
-
-
-        setupWifi.onclick = function() {
-            const ssid = wifiName.value;
-            const password = wifiPassword.value;
-            socket.send('wifi:' + ssid + ',' + password);
-            console.log('wifi:' + ssid + ',' + password);
-        }
-
-        brightnessSlider.oninput = function() {
-            brightnessValue.innerText = this.value;
-            socket.send('brightness:' + this.value);
-            console.log('brightness:' + this.value);
-        }
-
-        scaleSlider.oninput = function() {
-            scaleValue.innerText = this.value;
-            socket.send('scale:' + this.value);
-            console.log('scale:' + this.value);
-        }
-
-        speedSlider.oninput = function() {
-            speedValue.innerText = this.value;
-            socket.send('speed:' + this.value);
-            console.log('speed:' + this.value);
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
