@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 display.innerText = value;
                 sendSliderValue(command, value);
             }, 10)
-        ); // задержка 50 мс
+        ); // задержка 10 мс
     }
 
     // delay

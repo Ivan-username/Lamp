@@ -42,7 +42,6 @@ void setup()
 
   // LED setup
   ledsSetup();
-  modes[1].scale = 0; // костыль для правильной инициализации эффекта огня
 
   // WiFi setup
   Serial.println("Setting up WiFi: " + config.wifiMode);
@@ -59,4 +58,5 @@ void loop()
   webSocket.loop();
 
   effectsTick();
+  yield();
 }

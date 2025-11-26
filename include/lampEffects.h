@@ -154,7 +154,14 @@ void fireRoutine()
     if (effectSlowStart)
     {
         effectSlowStart = false;
-        //        FastLED.clear();
+        for (uint8_t i = 0; i < 8; i++){
+            for (uint8_t j = 0; j < 16; j++){
+                matrixValue[i][j] = 0;
+            }
+        }
+        for (uint8_t i = 0; i < WIDTH; i++){
+            line[i] = 0;
+        }
         generateLine();
     }
     if (pcnt >= 100)
@@ -174,7 +181,6 @@ void lavaNoise()
     {
         effectSlowStart = false;
         currentPalette = LavaColors_p;
-
         colorLoop = 0;
     }
 
