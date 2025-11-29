@@ -4,6 +4,7 @@
 #include "lampWiFi.h"
 #include "effectsTicker.h"
 #include "lampServer.h"
+#include "lampLedUtils.h"
 
 // Main program
 void setup()
@@ -42,6 +43,7 @@ void setup()
 
   // LED setup
   ledsSetup();
+  iconAnimation(&logoIcon[0][0], CRGB::Yellow);
 
   // WiFi setup
   DEBUGLN("Setting up WiFi: " + config.wifiMode);

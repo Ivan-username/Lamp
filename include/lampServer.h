@@ -3,6 +3,7 @@
 #include "config.h"
 #include "lampWiFi.h"
 #include "htmls.h"
+#include "lampLedUtils.h"
 
 void handlerRoot()
 {
@@ -15,7 +16,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     {
     case WStype_DISCONNECTED:
     {
-        Serial.println(" Disconnected!");
+        DEBUGLN(" Disconnected!");
         break;
     }
     case WStype_CONNECTED:
@@ -33,7 +34,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         {
             isOn = !isOn;
             effectSlowStart = true;
-            Serial.println("State: " + isOn ? "On" : "Off");
+            DEBUGLN("State: " + isOn ? "On" : "Off");
         }
         else if (String((char *)payload).startsWith("mode:"))
         {
@@ -43,25 +44,25 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             webSocket.sendTXT(num, ("brightness:" + String(modes[currentModeID].brightness)).c_str());
             webSocket.sendTXT(num, ("scale:" + String(modes[currentModeID].scale)).c_str());
             webSocket.sendTXT(num, ("speed:" + String(modes[currentModeID].speed)).c_str());
-            Serial.println("Mode: " + val);
+            DEBUGLN("Mode: " + val);
         }
         else if (String((char *)payload).startsWith("brightness:"))
         {
             String val = String((char *)payload).substring(11);
             modes[currentModeID].brightness = val.toInt();
-            Serial.println("Brightness: " + val);
+            DEBUGLN("Brightness: " + val);
         }
         else if (String((char *)payload).startsWith("scale:"))
         {
             String val = String((char *)payload).substring(6);
             modes[currentModeID].scale = val.toInt();
-            Serial.println("Scale: " + val);
+            DEBUGLN("Scale: " + val);
         }
         else if (String((char *)payload).startsWith("speed:"))
         {
             String val = String((char *)payload).substring(6);
             modes[currentModeID].speed = val.toInt();
-            Serial.println("Speed: " + val);
+            DEBUGLN("Speed: " + val);
         }
         else if (String((char *)payload).startsWith("wifi:"))
         {
@@ -74,15 +75,19 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             config.STAssid = ssid;
             config.STApassword = password;
             data.updateNow();
-            delay(1000);
+            iconAnimation(&rebootIcon[0][0], CRGB::Red);
             ESP.restart();
-            Serial.println("Recived new wifi config:" + ssid + ":" + password);
+            DEBUGLN("Recived new wifi config:" + ssid + ":" + password);
         }
         break;
     }
+    case WStype_PING:
+    {
+        DEBUGLN("WebSocket ping");
+    }
     default:
     {
-        Serial.println("WebSocket type received: " + String(type));
+        DEBUGLN("WebSocket type received: " + String(type));
         break;
     }
     }
@@ -93,8 +98,8 @@ void setupHttpServer()
 
     server.on("/", handlerRoot);
     server.begin();
-    delay(1000);
-    Serial.println("HTTP server started.");
+    iconAnimation(&httpIcon[0][0], CRGB::White);
+    DEBUGLN("HTTP server started.");
 }
 
 void setupWebsocketServer()
@@ -102,6 +107,6 @@ void setupWebsocketServer()
 
     webSocket.begin();
     webSocket.onEvent(webSocketEvent);
-    delay(1000);
-    Serial.println("WebSocket server started.");
+    iconAnimation(&webSocketIcon[0][0], CRGB::White);
+    DEBUGLN("WebSocket server started.");
 }
