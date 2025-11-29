@@ -2,188 +2,64 @@
 
 #include "config.h"
 
-static uint16_t x;
-static uint16_t y;
-static uint16_t z;
-
-#if (CONNECTION_ANGLE == 0 && STRIP_DIRECTION == 0)
-#define _WIDTH WIDTH
-#define THIS_X x
-#define THIS_Y y
-
-#elif (CONNECTION_ANGLE == 0 && STRIP_DIRECTION == 1)
-#define _WIDTH HEIGHT
-#define THIS_X y
-#define THIS_Y x
-
-#elif (CONNECTION_ANGLE == 1 && STRIP_DIRECTION == 0)
-#define _WIDTH WIDTH
-#define THIS_X x
-#define THIS_Y (HEIGHT - y - 1)
-
-#elif (CONNECTION_ANGLE == 1 && STRIP_DIRECTION == 3)
-#define _WIDTH HEIGHT
-#define THIS_X (HEIGHT - y - 1)
-#define THIS_Y x
-
-#elif (CONNECTION_ANGLE == 2 && STRIP_DIRECTION == 2)
-#define _WIDTH WIDTH
-#define THIS_X (WIDTH - x - 1)
-#define THIS_Y (HEIGHT - y - 1)
-
-#elif (CONNECTION_ANGLE == 2 && STRIP_DIRECTION == 3)
-#define _WIDTH HEIGHT
-#define THIS_X (HEIGHT - y - 1)
-#define THIS_Y (WIDTH - x - 1)
-
-#elif (CONNECTION_ANGLE == 3 && STRIP_DIRECTION == 2)
-#define _WIDTH WIDTH
-#define THIS_X (WIDTH - x - 1)
-#define THIS_Y y
-
-#elif (CONNECTION_ANGLE == 3 && STRIP_DIRECTION == 1)
-#define _WIDTH HEIGHT
-#define THIS_X y
-#define THIS_Y (WIDTH - x - 1)
-
-#else
-#define _WIDTH WIDTH
-#define THIS_X x
-#define THIS_Y y
-#pragma message "Wrong matrix parameters! Set to default"
-
-#endif
-
-uint16_t getPixelNumber(int8_t x, int8_t y)
+inline uint16_t getPixIndex(int8_t _x, int8_t _y)
 {
-    if ((THIS_Y % 2 == 0) || MATRIX_TYPE)
-    { // если чётная строка
-        return (THIS_Y * WIDTH + THIS_X);
+    const uint8_t width = WIDTH / 2;
+
+    switch (MATRIX_TYPE)
+    {
+    // ===== Type 0: обычная матрица (без змейки) =====
+    case 0:
+        return _y * WIDTH + _x;
+
+    // ===== Type 1: змейка построчная =====
+    case 1:
+    {
+        uint16_t base = _y * WIDTH;
+        return (_y & 1) ? (base + (WIDTH - 1 - _x)) : (base + _x);
     }
-    else
-    { // если нечётная строка
-        return (THIS_Y * WIDTH + WIDTH - THIS_X - 1);
+
+    // ===== Type 2: две 8x8 матрицы подряд (16×8), обе — змейкой =====
+    case 2:
+    {
+        uint16_t row = _y * width;
+        uint16_t panelOffset = width * HEIGHT;
+
+        bool isSecond = (_x >= width);
+        uint8_t localX = isSecond ? (_x - width) : _x;
+
+        uint16_t index = row + ((_y & 1) ? (width - 1 - localX) : localX);
+
+        return isSecond ? (index + panelOffset) : index;
     }
+    }
+
+    return 0;
 }
 
-// функция получения цвета пикселя по его номеру
-uint32_t getPixColor(int thisSegm)
+inline uint32_t getPixColor(int index)
 {
-    int thisPixel = thisSegm * SEGMENTS;
-    if (thisPixel < 0 || thisPixel > LED_NUM - 1)
+    if (index < 0 || index > LED_AMOUNT - 1)
         return 0;
-    return (((uint32_t)leds[thisPixel].r << 16) | ((long)leds[thisPixel].g << 8) | (long)leds[thisPixel].b);
+    return (((uint32_t)leds[index].r << 16) | ((long)leds[index].g << 8) | (long)leds[index].b);
 }
 
-// функция получения цвета пикселя в матрице по его координатам
-uint32_t getPixColorXY(int8_t x, int8_t y)
+inline uint32_t getPixColorXY(int8_t x, int8_t y)
 {
-    return getPixColor(getPixelNumber(x, y));
+    return getPixColor(getPixIndex(x, y));
 }
 
-// залить все
-void fillAll(CRGB color)
+inline void fillAll(CRGB color)
 {
-    for (int i = 0; i < LED_NUM; i++)
+    FOR_i(0, LED_AMOUNT)
     {
         leds[i] = color;
     }
 }
 
-// функция отрисовки точки по координатам X Y
-void drawPixelXY(int8_t x, int8_t y, CRGB color)
+inline void setPixColorXY(int8_t x, int8_t y, CRGB color)
 {
     if (x < 0 || x > WIDTH - 1 || y < 0 || y > HEIGHT - 1)
         return;
-    int thisPixel = getPixelNumber(x, y) * SEGMENTS;
-    for (byte i = 0; i < SEGMENTS; i++)
-    {
-        leds[thisPixel + i] = color;
-    }
-}
-
-//================= For noise effects =================//
-
-CRGBPalette16 currentPalette;
-uint8_t colorLoop = 1;
-uint8_t ihue = 0;
-
-uint16_t speed = 20; // speed is set dynamically once we've started up
-uint16_t scale = 30; // scale is set dynamically once we've started up
-
-void fillNoiseLED()
-{
-    uint8_t dataSmoothing = 0;
-    if (speed < 50)
-    {
-        dataSmoothing = 200 - (speed * 4);
-    }
-    for (int i = 0; i < MAX_DIMENSION; i++)
-    {
-        int ioffset = scale * i;
-        for (int j = 0; j < MAX_DIMENSION; j++)
-        {
-            int joffset = scale * j;
-
-            uint8_t data = inoise8(x + ioffset, y + joffset, z);
-
-            data = qsub8(data, 16);
-            data = qadd8(data, scale8(data, 39));
-
-            if (dataSmoothing)
-            {
-                uint8_t olddata = noise[i][j];
-                uint8_t newdata = scale8(olddata, dataSmoothing) + scale8(data, 256 - dataSmoothing);
-                data = newdata;
-            }
-
-            noise[i][j] = data;
-        }
-    }
-    z += speed;
-
-    // apply slow drift to X and Y, just for visual variation.
-    x += speed / 8;
-    y -= speed / 16;
-
-    for (int i = 0; i < WIDTH; i++)
-    {
-        for (int j = 0; j < HEIGHT; j++)
-        {
-            uint8_t index = noise[j][i];
-            uint8_t bri = noise[i][j];
-            // if this palette is a 'loop', add a slowly-changing base value
-            if (colorLoop)
-            {
-                index += ihue;
-            }
-            // brighten up, as the color palette itself often contains the
-            // light/dark dynamic range desired
-            if (bri > 127)
-            {
-                bri = 255;
-            }
-            else
-            {
-                bri = dim8_raw(bri * 2);
-            }
-            CRGB color = ColorFromPalette(currentPalette, index, bri);
-            drawPixelXY(i, j, color); // leds[getPixelNumber(i, j)] = color;
-        }
-    }
-    ihue += 1;
-}
-
-void fillnoise8()
-{
-    for (int i = 0; i < MAX_DIMENSION; i++)
-    {
-        int ioffset = scale * i;
-        for (int j = 0; j < MAX_DIMENSION; j++)
-        {
-            int joffset = scale * j;
-            noise[i][j] = inoise8(x + ioffset, y + joffset, z);
-        }
-    }
-    z += speed;
+    leds[getPixIndex(x, y)] = color;
 }

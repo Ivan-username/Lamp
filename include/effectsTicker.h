@@ -28,18 +28,16 @@ void effectsTick()
             switch (currentModeID)
             {
             case 0:
+            {
                 lampRoutine();
                 break;
+            }
             case 1:
+            {
                 fireRoutine();
                 break;
-            case 2:
-                lavaNoise();
-                break;
-            default:
-                break;
             }
-
+            }
             FastLED.setBrightness(modes[currentModeID].brightness);
             FastLED.show();
         }

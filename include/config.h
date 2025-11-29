@@ -15,24 +15,14 @@ const char *APpassword = "12345678";
 #define SERVER_PORT 80
 
 // Effect configuration
-#define MODE_AMOUNT 3
+#define MODE_AMOUNT 1
 uint8_t currentModeID = 0;
 
 // LED matrix configuration
 #define WIDTH 16
-#define HEIGHT 16
-#define LED_NUM (WIDTH * HEIGHT)
-#define SEGMENTS 1
-#define MATRIX_TYPE 0      // 0-змейка 1-рядками
-#define CONNECTION_ANGLE 0 // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
-#define STRIP_DIRECTION 0  // направление ленты из угла: 0 - вправо, 1 - вверх, 2 - влево, 3 - вниз
-
-#define MAX_DIMENSION (max(WIDTH, HEIGHT))
-#if (WIDTH > HEIGHT)
-uint8_t noise[WIDTH][WIDTH];
-#else
-uint8_t noise[HEIGHT][HEIGHT];
-#endif
+#define HEIGHT 8
+#define LED_AMOUNT (WIDTH * HEIGHT)
+#define MATRIX_TYPE 2 // 0-рядками 1-змейка 2-(8х8)х2
 
 // Configuration structure
 struct Config
@@ -57,6 +47,10 @@ boolean effectSlowStart = true;
 boolean isOn = false;
 
 // Objects
-CRGB leds[LED_NUM];
+CRGB leds[LED_AMOUNT];
 WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80
+
+#define FOR_i(x, y) for (int i = (x); i < (y); i++)
+#define FOR_j(x, y) for (int j = (x); j < (y); j++)
+#define FOR_k(x, y) for (int k = (x); k < (y); k++)

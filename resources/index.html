@@ -1,91 +1,116 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Lamp</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <head>
+        <title>Lamp</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <h1>Lamp</h1>
 
-    <h1>Lamp</h1>
-    
-    <div class="settings" id="settings">
-
-        <div class="connectionStatus">
-
-        </div>
-<hr>
-        <div class="modes" id="modes">
-            <div class="mode" id="lamp">lamp</div>
-            <div class="mode" id="fire">fire</div>
-            <div class="mode" id="lava">lava</div>
-        </div>
-
-        <hr>
-
+        <div class="settings" id="settings">
+            <div class="connectionStatus"> </div>
+            <hr />
+            <div class="modes" id="modes">
+                <div class="mode" id="lamp">lamp</div>
+                <div class="mode" id="fire">fire</div>
+                <div class="mode" id="lava">lava</div>
+            </div>
+            <hr />
             <div class="slider-container">
                 <div class="slider-info">
-                    <span class="slider-name" id="slider-name">Brightness:</span>
+                    <span class="slider-name" id="slider-name"
+                        >Brightness:</span
+                    >
                     <span id="brightness-value"></span>
                 </div>
-                <input type="range" min="1" max="255" id="slider-brightness" class="slider">
+                <input
+                    type="range"
+                    min="1"
+                    max="255"
+                    id="slider-brightness"
+                    class="slider"
+                />
             </div>
-<hr>
+            <hr />
             <div class="slider-container">
                 <div class="slider-info">
                     <span class="slider-name" id="slider-name">Scale:</span>
                     <span id="scale-value"></span>
                 </div>
-                <input type="range" min="1" max="255" id="slider-scale" class="slider">
+                <input
+                    type="range"
+                    min="1"
+                    max="255"
+                    id="slider-scale"
+                    class="slider"
+                />
             </div>
-<hr>
+            <hr />
             <div class="slider-container">
                 <div class="slider-info">
                     <span class="slider-name" id="slider-name">Speed:</span>
                     <span id="speed-value"></span>
                 </div>
-                <input type="range" min="1" max="50" id="slider-speed" class="slider">
+                <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    id="slider-speed"
+                    class="slider"
+                />
+            </div>
+            <hr />
+            <div class="div-button" id="onoff-button">
+                <span class="onoff-text" id="onoff-text">Switch</span>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="div-button" id="options-button">
+                <span class="options-text" id="options-text">Options</span>
             </div>
 
-        <hr>
-
-        <div class="div-button" id="onoff-button">
-            <span class="onoff-text" id="onoff-text">Switch
-        </div>
-    </div>
-
-    <div class="settings">
-        
-        <div class="div-button" id="options-button">
-            <span class="options-text" id="options-text">Options</span>
-        </div>
-
-        <div id="options" class="options">
-            <hr>
-            <div class="wifi-sta" id="wifi-sta">
-                <div class="sta-container">
-                    <div class="sta-name">
-                        <span>Name:</span>
-                        <input class="sta-input" type="text" required placeholder="..." id="wifiName">
+            <div id="options" class="options">
+                <hr />
+                <div class="wifi-sta" id="wifi-sta">
+                    <div class="sta-container">
+                        <div class="sta-name">
+                            <span>Name:</span>
+                            <input
+                                class="sta-input"
+                                type="text"
+                                required
+                                placeholder="..."
+                                id="wifiName"
+                            />
+                        </div>
+                        <div class="sta-password">
+                            <span>Pass:</span>
+                            <input
+                                class="sta-input"
+                                type="text"
+                                required
+                                password
+                                placeholder="..."
+                                id="wifiPassword"
+                            />
+                        </div>
                     </div>
-                    <div class="sta-password">
-                        <span>Pass:</span>
-                        <input class="sta-input" type="text" required password placeholder="..." id="wifiPassword">
+                    <div class="div-button" id="sta-button">
+                        <span class="sta-text" id="sta-text">Set new WiFi</span>
                     </div>
                 </div>
-                <div class="div-button" id="sta-button">
-                    <span class="sta-text" id="sta-text">Set new WiFi</span>
-                </div>
-            </div>
-            <hr>
-            <div class="wifi-ap" id="wifi-ap">
-                <div class="div-button" id="ap-button">
-                    <span class="ap-text" id="ap-text">Switch to AP Mode</span>
+                <hr />
+                <div class="wifi-ap" id="wifi-ap">
+                    <div class="div-button" id="ap-button">
+                        <span class="ap-text" id="ap-text"
+                            >Switch to AP Mode</span
+                        >
+                    </div>
                 </div>
             </div>
         </div>
-
-    </div>
-    <script src="script.js"></script>
-</body>
+        <script src="script.js"></script>
+    </body>
 </html>

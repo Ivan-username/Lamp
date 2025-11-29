@@ -3,11 +3,9 @@
 #include "config.h"
 #include "lampuLedUtilits.h"
 
-unsigned char matrixValue[8][16];
-
 void ledsSetup()
 {
-    FastLED.addLeds<WS2812, D4, GRB>(leds, LED_NUM);
+    FastLED.addLeds<WS2812, D4, GRB>(leds, LED_AMOUNT);
     FastLED.setBrightness(modes[0].brightness);
     FastLED.clear(true);
 }
@@ -17,19 +15,38 @@ void offRoutine()
     fillAll(CRGB::Black);
 }
 
-//================= Lamp =================// 0
+//================= Red =================// 0
+int J = 0;
+boolean flag = true;
 void lampRoutine()
 {
     if (effectSlowStart)
     {
         effectSlowStart = false;
+        J = 0;
     }
-    fillAll(CRGB::White);
+    if (J > WIDTH)
+    {
+        J = 0;
+        flag = !flag;
+    }
+
+    FOR_i(0, HEIGHT)
+    {
+        if (flag)
+            setPixColorXY(J, i, CRGB::Red);
+        else
+            setPixColorXY(J, i, CRGB::Black);
+    }
+
+    J++;
 }
 //================= Fire =================// 1
+// эффект "огонь"
 #define SPARKLES 1 // вылетающие угольки вкл выкл
 unsigned char line[WIDTH];
 int pcnt = 0;
+unsigned char matrixValue[8][16];
 // these values are substracetd from the generated values to give a shape to the animation
 const unsigned char valueMask[8][16] PROGMEM = {
     {32, 0, 0, 0, 0, 0, 0, 32, 32, 0, 0, 0, 0, 0, 0, 32},
@@ -113,23 +130,23 @@ void drawFrame(int pcnt)
                     (uint8_t)max(0, nextv)                                     // V
                 );
 
-                leds[getPixelNumber(x, y)] = color;
+                leds[getPixIndex(x, y)] = color;
             }
             else if (y == 8 && SPARKLES)
             {
                 if (random(0, 20) == 0 && getPixColorXY(x, y - 1) != 0)
-                    drawPixelXY(x, y, getPixColorXY(x, y - 1));
+                    setPixColorXY(x, y, getPixColorXY(x, y - 1));
                 else
-                    drawPixelXY(x, y, 0);
+                    setPixColorXY(x, y, 0);
             }
             else if (SPARKLES)
             {
 
                 // старая версия для яркости
                 if (getPixColorXY(x, y - 1) > 0)
-                    drawPixelXY(x, y, getPixColorXY(x, y - 1));
+                    setPixColorXY(x, y, getPixColorXY(x, y - 1));
                 else
-                    drawPixelXY(x, y, 0);
+                    setPixColorXY(x, y, 0);
             }
         }
     }
@@ -145,23 +162,15 @@ void drawFrame(int pcnt)
             255,                                                                           // S
             (uint8_t)(((100.0 - pcnt) * matrixValue[0][newX] + pcnt * line[newX]) / 100.0) // V
         );
-        leds[getPixelNumber(newX, 0)] = color;
+        leds[getPixIndex(newX, 0)] = color;
     }
 }
-
 void fireRoutine()
 {
     if (effectSlowStart)
     {
         effectSlowStart = false;
-        for (uint8_t i = 0; i < 8; i++){
-            for (uint8_t j = 0; j < 16; j++){
-                matrixValue[i][j] = 0;
-            }
-        }
-        for (uint8_t i = 0; i < WIDTH; i++){
-            line[i] = 0;
-        }
+        // FastLED.clear();
         generateLine();
     }
     if (pcnt >= 100)
@@ -172,19 +181,4 @@ void fireRoutine()
     }
     drawFrame(pcnt);
     pcnt += 30;
-}
-
-//================= Lava =================// 2
-void lavaNoise()
-{
-    if (effectSlowStart)
-    {
-        effectSlowStart = false;
-        currentPalette = LavaColors_p;
-        colorLoop = 0;
-    }
-
-    scale = modes[currentModeID].scale;
-    speed = modes[currentModeID].speed;
-    fillNoiseLED();
 }

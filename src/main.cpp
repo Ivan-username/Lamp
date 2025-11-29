@@ -55,8 +55,8 @@ void setup()
 void loop()
 {
   server.handleClient();
-  webSocket.loop();
-
-  effectsTick();
   yield();
+  webSocket.loop();
+  yield();
+  effectsTick();
 }
