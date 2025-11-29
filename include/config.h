@@ -15,7 +15,7 @@ const char *APpassword = "12345678";
 #define SERVER_PORT 80
 
 // Effect configuration
-#define MODE_AMOUNT 1
+#define MODE_AMOUNT 2
 uint8_t currentModeID = 0;
 
 // LED matrix configuration
@@ -51,6 +51,15 @@ CRGB leds[LED_AMOUNT];
 WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80
 
-#define FOR_i(x, y) for (int i = (x); i < (y); i++)
-#define FOR_j(x, y) for (int j = (x); j < (y); j++)
-#define FOR_k(x, y) for (int k = (x); k < (y); k++)
+#define FOR_i(x, y) for (uint8_t i = (x); i < (y); i++)
+#define FOR_j(x, y) for (uint8_t j = (x); j < (y); j++)
+#define FOR_k(x, y) for (uint8_t k = (x); k < (y); k++)
+
+#define DEBUG_SERIAL_LAMP 1
+#ifdef DEBUG_SERIAL_LAMP
+#define DEBUGLN(x) Serial.println(x)
+#define DEBUG(x) Serial.print(x)
+#else
+#define DEBUGLN(x)
+#define DEBUG(x)
+#endif

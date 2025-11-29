@@ -1,7 +1,7 @@
 #pragma once
 
 #include "config.h"
-#include "lampuLedUtilits.h"
+#include "lampLedUtils.h"
 
 void ledsSetup()
 {

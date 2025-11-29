@@ -9,7 +9,7 @@
 void setup()
 {
   Serial.begin(115200);
-  delay(1000);
+  delay(2000);
 
   LittleFS.begin();
 
@@ -17,34 +17,34 @@ void setup()
   switch (stat)
   {
   case FD_FS_ERR:
-    Serial.println("FS Error");
+    DEBUGLN("FS Error");
     break;
   case FD_FILE_ERR:
-    Serial.println("Error");
+    DEBUGLN("Error");
     break;
   case FD_WRITE:
-    Serial.println("Data Write");
+    DEBUGLN("Data Write");
     break;
   case FD_ADD:
-    Serial.println("Data Add");
+    DEBUGLN("Data Add");
     break;
   case FD_READ:
-    Serial.println("Data Read");
+    DEBUGLN("Data Read");
     break;
   default:
     break;
   }
 
-  Serial.println("Data read:");
-  Serial.println(config.wifiMode);
-  Serial.println(config.STAssid);
-  Serial.println(config.STApassword);
+  DEBUGLN("Data read:");
+  DEBUGLN(config.wifiMode);
+  DEBUGLN(config.STAssid);
+  DEBUGLN(config.STApassword);
 
   // LED setup
   ledsSetup();
 
   // WiFi setup
-  Serial.println("Setting up WiFi: " + config.wifiMode);
+  DEBUGLN("Setting up WiFi: " + config.wifiMode);
   setupWiFi();
 
   // sevver setup

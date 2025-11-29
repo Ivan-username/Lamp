@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.h"
+#include "iconViewer.h"
 
 static byte reconnectionTries = 10;
 
@@ -15,9 +16,9 @@ void setupAPMode()
     WiFi.softAP(APssid, APpassword);
     WiFi.softAPConfig(local_ip, gateway, subnet);
 
-    Serial.print("Access Point IP address: ");
-    Serial.println(WiFi.softAPIP());
-    delay(1000);
+    DEBUG("Access Point IP address: ");
+    DEBUGLN(WiFi.softAPIP());
+    iconAnimation(&apIcon[0][0], CRGB::Green);
 }
 
 void setupSTAMode()
@@ -27,16 +28,18 @@ void setupSTAMode()
 
     while (--reconnectionTries && WiFi.status() != WL_CONNECTED)
     {
-        delay(1000);
-        Serial.println(".");
+        iconAnimation(&staIcon[0][0], CRGB::White);
+        DEBUGLN(".");
     }
     if (WiFi.status() == WL_CONNECTED)
     {
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
+        iconAnimation(&staIcon[0][0], CRGB::Green);
+        DEBUG("IP address: ");
+        DEBUGLN(WiFi.localIP());
     }
     else
     {
+        iconAnimation(&staIcon[0][0], CRGB::Red);
         WiFi.disconnect();
         setupAPMode();
     }
@@ -45,11 +48,7 @@ void setupSTAMode()
 void setupWiFi()
 {
     if (config.wifiMode == 0)
-    {
         setupSTAMode();
-    }
     else
-    {
         setupAPMode();
-    }
 }
