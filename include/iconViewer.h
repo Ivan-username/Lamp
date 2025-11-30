@@ -22,35 +22,35 @@ const uint8_t logoIcon[8][8] PROGMEM =
      {0, 0, 0, 1, 1, 0, 0, 0},
      {0, 0, 0, 0, 0, 0, 0, 0}};
 
-const uint8_t staIcon[8][8] PROGMEM = {
-    {0, 0, 0, 1, 1, 0, 0, 0},
-    {0, 1, 1, 0, 0, 1, 1, 0},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {0, 0, 1, 1, 1, 1, 0, 0},
-    {0, 1, 0, 0, 0, 0, 1, 0},
-    {0, 0, 0, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 1, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0}};
+const uint8_t staIcon[8][8] PROGMEM =
+    {{0, 0, 0, 1, 1, 0, 0, 0},
+     {0, 1, 1, 0, 0, 1, 1, 0},
+     {1, 0, 0, 0, 0, 0, 0, 1},
+     {0, 0, 1, 1, 1, 1, 0, 0},
+     {0, 1, 0, 0, 0, 0, 1, 0},
+     {0, 0, 0, 1, 1, 0, 0, 0},
+     {0, 0, 0, 1, 1, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0}};
 
-const uint8_t apIcon[8][8] PROGMEM = {
-    {0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 1, 1, 1, 0, 0, 0, 0},
-    {1, 0, 0, 0, 1, 0, 0, 0},
-    {1, 0, 0, 0, 1, 1, 1, 0},
-    {0, 1, 1, 1, 0, 0, 0, 1},
-    {0, 0, 0, 1, 0, 0, 0, 1},
-    {0, 0, 0, 0, 1, 1, 1, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0}};
+const uint8_t apIcon[8][8] PROGMEM =
+    {{0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 1, 1, 1, 0, 0, 0, 0},
+     {1, 0, 0, 0, 1, 0, 0, 0},
+     {1, 0, 0, 0, 1, 1, 1, 0},
+     {0, 1, 1, 1, 0, 0, 0, 1},
+     {0, 0, 0, 1, 0, 0, 0, 1},
+     {0, 0, 0, 0, 1, 1, 1, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0}};
 
-const uint8_t httpIcon[8][8] PROGMEM = {
-    {0, 0, 1, 1, 1, 1, 0, 0},
-    {0, 1, 0, 1, 1, 0, 1, 0},
-    {1, 0, 1, 1, 1, 1, 0, 1},
-    {1, 1, 1, 0, 0, 1, 1, 1},
-    {1, 0, 1, 1, 1, 1, 0, 1},
-    {1, 1, 1, 0, 0, 1, 1, 1},
-    {0, 1, 0, 1, 1, 0, 1, 0},
-    {0, 0, 1, 1, 1, 1, 0, 0}};
+const uint8_t httpIcon[8][8] PROGMEM =
+    {{0, 0, 1, 1, 1, 1, 0, 0},
+     {0, 1, 0, 1, 1, 0, 1, 0},
+     {1, 0, 1, 1, 1, 1, 0, 1},
+     {1, 1, 1, 0, 0, 1, 1, 1},
+     {1, 0, 1, 1, 1, 1, 0, 1},
+     {1, 1, 1, 0, 0, 1, 1, 1},
+     {0, 1, 0, 1, 1, 0, 1, 0},
+     {0, 0, 1, 1, 1, 1, 0, 0}};
 
 const uint8_t webSocketIcon[8][8] PROGMEM =
     {{0, 0, 0, 0, 0, 0, 0, 0},
@@ -62,15 +62,15 @@ const uint8_t webSocketIcon[8][8] PROGMEM =
      {0, 0, 1, 0, 0, 1, 0, 0},
      {0, 0, 0, 0, 0, 0, 0, 0}};
 
-const uint8_t rebootIcon[8][8] PROGMEM = {
-    {0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 1, 1, 1, 1, 0, 0},
-    {0, 1, 0, 0, 1, 0, 0, 0},
-    {0, 1, 0, 0, 0, 0, 0, 0},
-    {0, 1, 0, 0, 0, 0, 1, 0},
-    {0, 1, 0, 0, 0, 0, 1, 0},
-    {0, 0, 1, 1, 1, 1, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0}};
+const uint8_t rebootIcon[8][8] PROGMEM =
+    {{0, 0, 0, 0, 1, 0, 0, 0},
+     {0, 0, 1, 1, 1, 1, 0, 0},
+     {0, 1, 0, 0, 1, 0, 0, 0},
+     {0, 1, 0, 0, 0, 0, 0, 0},
+     {0, 1, 0, 0, 0, 0, 1, 0},
+     {0, 1, 0, 0, 0, 0, 1, 0},
+     {0, 0, 1, 1, 1, 1, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0}};
 
 void iconAnimation(const uint8_t *icon, CRGB color)
 {
@@ -79,12 +79,33 @@ void iconAnimation(const uint8_t *icon, CRGB color)
   const uint8_t ICON_SIZE = 8;
 
   FastLED.clear();
-  for (uint8_t y = 0; y < ICON_SIZE; y++)
-    for (uint8_t x = 0; x < ICON_SIZE; x++)
-      setPixColorXY(startX + x, startY + y,
-                    pgm_read_byte(icon + (7 - y) * 8 + x) ? color : CRGB::Black);
 
-  FastLED.setBrightness(100);
+  FOR_U8_I(0, ICON_SIZE)
+  {
+    FOR_U8_J(0, ICON_SIZE)
+    {
+      setPixColorXY(startX + j, startY + i,
+                    pgm_read_byte(icon + (7 - i) * 8 + j) ? color : CRGB::Black);
+    }
+  }
+
   FastLED.show();
-  delay(1000);
+  yield();
+
+  const uint16_t durationMs = 1000; // animation time in ms
+  const uint16_t steps = 200;
+  const float stepTime = (float)durationMs / steps;
+
+  FOR_U16_I(0, steps)
+  {
+    float t = (float)i / (steps - 1);
+    float wave = sin(PI * t);
+
+    uint8_t brightness = (uint8_t)(wave * 50);
+
+    FastLED.setBrightness(brightness);
+    FastLED.show();
+
+    delay(stepTime);
+  }
 }

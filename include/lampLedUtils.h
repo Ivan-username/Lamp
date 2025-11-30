@@ -51,7 +51,7 @@ inline uint32_t getPixColorXY(int8_t x, int8_t y)
 
 inline void fillAll(CRGB color)
 {
-    FOR_i(0, LED_AMOUNT)
+    FOR_U8_I(0, LED_AMOUNT)
     {
         leds[i] = color;
     }

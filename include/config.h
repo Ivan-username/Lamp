@@ -27,7 +27,7 @@ uint8_t currentModeID = 0;
 // Configuration structure
 struct Config
 {
-    uint8_t wifiMode = 0; // 0 - Router, 1 - Access Point
+    uint8_t wifiMode = 0; // 0 - STA, 1 - AP
     String STAssid = "keenuka";
     String STApassword = "ZreTHEA43";
 };
@@ -51,9 +51,12 @@ CRGB leds[LED_AMOUNT];
 WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80
 
-#define FOR_i(x, y) for (uint8_t i = (x); i < (y); i++)
-#define FOR_j(x, y) for (uint8_t j = (x); j < (y); j++)
-#define FOR_k(x, y) for (uint8_t k = (x); k < (y); k++)
+#define FOR_U8_I(x, y) for (uint8_t i = (x); i < (y); i++)
+#define FOR_U8_J(x, y) for (uint8_t j = (x); j < (y); j++)
+#define FOR_U8_K(x, y) for (uint8_t k = (x); k < (y); k++)
+#define FOR_U16_I(x, y) for (uint16_t i = (x); i < (y); i++)
+#define FOR_U16_J(x, y) for (uint16_t j = (x); j < (y); j++)
+#define FOR_U16_K(x, y) for (uint16_t k = (x); k < (y); k++)
 
 #define DEBUG_SERIAL_LAMP 1
 #ifdef DEBUG_SERIAL_LAMP

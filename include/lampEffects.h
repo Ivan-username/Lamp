@@ -31,7 +31,7 @@ void lampRoutine()
         flag = !flag;
     }
 
-    FOR_i(0, HEIGHT)
+    FOR_U8_I(0, HEIGHT)
     {
         if (flag)
             setPixColorXY(J, i, CRGB::Red);
