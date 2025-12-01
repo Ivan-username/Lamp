@@ -41,6 +41,14 @@ void setup()
   DEBUGLN(config.STAssid);
   DEBUGLN(config.STApassword);
 
+  Dir dir = LittleFS.openDir("/");
+  while (dir.next())
+  {
+    Serial.printf("FILE: %s (%d bytes)\n",
+                  dir.fileName().c_str(),
+                  dir.fileSize());
+  }
+
   // LED setup
   ledsSetup();
   iconAnimation(&logoIcon[0][0], CRGB::Yellow);

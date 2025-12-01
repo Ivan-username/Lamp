@@ -21,3 +21,13 @@ pio device monitor
 ```
 pio run -e wireless -t upload
 ```
+
+### Upload LittleFS
+```
+pio run --target uploadfs
+```
+
+### Clean Flash
+```
+pio run --target erase
+```

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lamp</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <h1>Lamp</h1>
+
+        <div class="card">
+            <div class="status-bar" id="status-bar"></div>
+            <div class="card-btn" id="card-btn-reload">
+                <img src="icons/reload.svg" alt="" />
+                <span id="ip">0.0.0.0</span>
+            </div>
+            <hr />
+            <div class="effects" id="effects">
+                <div>lamp</div>
+                <div>fire</div>
+                <div>lava</div>
+            </div>
+            <hr />
+            <div class="slider">
+                <img src="icons/brightness.svg" alt="" />
+                <input type="range" min="1" max="100" id="slider-brightness" />
+            </div>
+            <hr />
+            <div class="slider">
+                <img src="icons/scale.svg" alt="" />
+                <input type="range" min="1" max="100" id="slider-scale" />
+            </div>
+            <hr />
+            <div class="slider">
+                <img src="icons/speed.svg" alt="" />
+                <input type="range" min="1" max="100" id="slider-speed" />
+            </div>
+            <hr />
+            <div class="card-btn" id="card-btn-onoff">
+                <img src="icons/onoff.svg" alt="" />
+                <span id="card-btn-onoff-text">Switch</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-btn" id="card-btn-options">
+                <img src="icons/options.svg" alt="" />
+                <span id="card-btn-options-text">Options</span>
+            </div>
+
+            <div id="options" class="options">
+                <hr />
+                <div class="wifi-sta" id="wifi-sta">
+                    <input type="text" placeholder="Name" id="sta-name" />
+                    <input
+                        type="text"
+                        placeholder="Password"
+                        id="sta-password"
+                    />
+                </div>
+                <div class="card-btn" id="card-btn-sta">
+                    <img src="icons/sta.svg" alt="" />
+                    <span id="sta-text">Set new WiFi</span>
+                </div>
+                <hr />
+                <div class="card-btn" id="card-btn-ap">
+                    <img src="icons/ap.svg" alt="" />
+                    <span id="ap-text">Switch to AP Mode</span>
+                </div>
+                <hr />
+                <div class="card-btn" id="card-btn-reboot">
+                    <img src="icons/reboot.svg" alt="" />
+                    <span id="reboot-text">Reboot</span>
+                </div>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>
