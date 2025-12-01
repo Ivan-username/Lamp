@@ -51,7 +51,7 @@ void setup()
 
   // LED setup
   ledsSetup();
-  iconAnimation(&logoIcon[0][0], CRGB::Yellow);
+  iconAnimation(&logoIcon[0][0], CRGB::Yellow, 1000); // "Logo"
 
   // WiFi setup
   DEBUGLN("Setting up WiFi: " + config.wifiMode);
@@ -59,7 +59,7 @@ void setup()
 
   // sevver setup
   setupHttpServer();
-  setupWebsocketServer();
+  setupWebSocketServer();
 }
 
 void loop()

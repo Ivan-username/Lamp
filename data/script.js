@@ -91,16 +91,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = staPassword.value;
         socket.send("sta:" + ssid + "," + password);
         console.log("sta:" + ssid + "," + password);
+        statusBar.style.backgroundColor = "red";
     };
 
     setupAPBtn.onclick = function () {
         socket.send("ap");
         console.log("ap");
+        statusBar.style.backgroundColor = "red";
     };
 
     rebootBtn.onclick = function () {
         socket.send("reboot");
         console.log("reboot");
+        statusBar.style.backgroundColor = "red";
     };
 
     // sliders

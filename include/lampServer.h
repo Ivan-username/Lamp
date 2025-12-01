@@ -120,7 +120,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             config.STAssid = ssid;
             config.STApassword = password;
             data.updateNow();
-            iconAnimation(&rebootIcon[0][0], CRGB::Red);
+            iconAnimation(&rebootIcon[0][0], CRGB::Red, 1000);
             ESP.restart();
             DEBUGLN("Recived new wifi config:" + ssid + ":" + password);
         }
@@ -128,13 +128,13 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         {
             config.wifiMode = 1;
             data.updateNow();
-            iconAnimation(&rebootIcon[0][0], CRGB::Red);
+            iconAnimation(&rebootIcon[0][0], CRGB::Red, 1000);
             ESP.restart();
             DEBUGLN("Switched to ap mode");
         }
         else if (String((char *)payload).startsWith("reboot"))
         {
-            iconAnimation(&rebootIcon[0][0], CRGB::Red);
+            iconAnimation(&rebootIcon[0][0], CRGB::Red, 1000);
             ESP.restart();
         }
         break;
@@ -153,7 +153,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
 void setupHttpServer()
 {
-
     server.on("/", handleIndex);
     server.on("/index.html", handleIndex);
 
@@ -172,15 +171,14 @@ void setupHttpServer()
     server.on("/icons/reboot.svg", handleSvg);
 
     server.begin();
-    iconAnimation(&httpIcon[0][0], CRGB::White);
+    iconAnimation(&httpIcon[0][0], CRGB::White, 500);
     DEBUGLN("HTTP server started.");
 }
 
-void setupWebsocketServer()
+void setupWebSocketServer()
 {
-
     webSocket.begin();
     webSocket.onEvent(webSocketEvent);
-    iconAnimation(&webSocketIcon[0][0], CRGB::White);
+    iconAnimation(&webSocketIcon[0][0], CRGB::White, 500);
     DEBUGLN("WebSocket server started.");
 }

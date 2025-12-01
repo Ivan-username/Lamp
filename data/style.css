@@ -111,12 +111,14 @@ img {
 }
 
 .effects > div {
-    margin: 0 2px;
+    margin: 2px;
     padding: 12px 16px;
     border-radius: 10px;
-    border-color: #fff;
-    border-style: dashed;
     color: var(--muted);
+}
+
+.effects > div:active {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /*========== sliders ==========*/

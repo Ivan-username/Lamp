@@ -15,10 +15,14 @@ const char *APpassword = "12345678";
 #define SERVER_PORT 80
 
 // Effect configuration
-#define MODE_AMOUNT 2
+#define MODE_AMOUNT 4
 uint8_t currentModeID = 0;
 
 // LED matrix configuration
+#define LED_TYPE WS2812
+#define LED_PIN D4
+#define LED_COL_ORDER GRB
+
 #define WIDTH 16
 #define HEIGHT 8
 #define LED_AMOUNT (WIDTH * HEIGHT)
@@ -29,7 +33,7 @@ struct Config
 {
     uint8_t wifiMode = 0; // 0 - STA, 1 - AP
     String STAssid = "keenuka";
-    String STApassword = "ZreTHEA43";
+    String STApassword = "ZreTHEA44";
 };
 Config config;
 

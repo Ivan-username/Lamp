@@ -72,7 +72,7 @@ const uint8_t rebootIcon[8][8] PROGMEM =
      {0, 0, 1, 1, 1, 1, 0, 0},
      {0, 0, 0, 0, 0, 0, 0, 0}};
 
-void iconAnimation(const uint8_t *icon, CRGB color)
+void iconAnimation(const uint8_t *icon, CRGB color, uint16_t duration)
 {
   const uint8_t startX = WIDTH / 2 - 4;
   const uint8_t startY = HEIGHT / 2 - 4;
@@ -92,9 +92,8 @@ void iconAnimation(const uint8_t *icon, CRGB color)
   FastLED.show();
   yield();
 
-  const uint16_t durationMs = 1000; // animation time in ms
   const uint16_t steps = 200;
-  const float stepTime = (float)durationMs / steps;
+  const float stepTime = (float)duration / steps;
 
   FOR_U16_I(0, steps)
   {

@@ -18,8 +18,7 @@ void effectsTick()
     {
         if (effectSlowStart)
         {
-            offRoutine();
-            FastLED.show();
+            FastLED.clear();
         }
         if (millis() - effTimer >= modes[currentModeID].speed)
         {
@@ -35,6 +34,16 @@ void effectsTick()
             case 1:
             {
                 fireRoutine();
+                break;
+            }
+            case 2:
+            {
+                rainbowVertical();
+                break;
+            }
+            case 3:
+            {
+                rainbowHorizontal();
                 break;
             }
             }

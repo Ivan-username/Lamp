@@ -18,7 +18,7 @@ void setupAPMode()
 
     DEBUG("Access Point IP address: ");
     DEBUGLN(WiFi.softAPIP());
-    iconAnimation(&apIcon[0][0], CRGB::Green);
+    iconAnimation(&apIcon[0][0], CRGB::Green, 500);
 }
 
 void setupSTAMode()
@@ -28,18 +28,18 @@ void setupSTAMode()
 
     while (--reconnectionTries && WiFi.status() != WL_CONNECTED)
     {
-        iconAnimation(&staIcon[0][0], CRGB::White);
+        iconAnimation(&staIcon[0][0], CRGB::White, 1000);
         DEBUGLN(".");
     }
     if (WiFi.status() == WL_CONNECTED)
     {
-        iconAnimation(&staIcon[0][0], CRGB::Green);
+        iconAnimation(&staIcon[0][0], CRGB::Green, 500);
         DEBUG("IP address: ");
         DEBUGLN(WiFi.localIP());
     }
     else
     {
-        iconAnimation(&staIcon[0][0], CRGB::Red);
+        iconAnimation(&staIcon[0][0], CRGB::Red, 500);
         WiFi.disconnect();
         setupAPMode();
     }
