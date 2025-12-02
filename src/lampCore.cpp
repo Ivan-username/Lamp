@@ -3,7 +3,8 @@
 
 #include "lampWiFi.h"
 #include "effectsTicker.h"
-#include "lampServer.h"
+#include "httpServer.h"
+#include "webSocketServer.h"
 #include "lampLedUtils.h"
 
 // Main program

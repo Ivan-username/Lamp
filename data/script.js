@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     socket.onmessage = function (event) {
+        statusBar.style.backgroundColor = "green";
         console.log("event:" + event.data);
         if (event.data.startsWith("ip:")) {
             ip.textContent = event.data.substring(3);
@@ -66,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     //elems events
-
     reloadBtn.onclick = function () {
         location.reload(true);
     };

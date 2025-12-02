@@ -107,4 +107,5 @@ void iconAnimation(const uint8_t *icon, CRGB color, uint16_t duration)
 
     delay(stepTime);
   }
+  FastLED.clear();
 }

@@ -8,18 +8,18 @@ inline uint16_t getPixIndex(int8_t _x, int8_t _y)
 
     switch (MATRIX_TYPE)
     {
-    // ===== Type 0: обычная матрица (без змейки) =====
+    // ===== Type 0: rows =====
     case 0:
         return _y * WIDTH + _x;
 
-    // ===== Type 1: змейка построчная =====
+    // ===== Type 1: snake =====
     case 1:
     {
         uint16_t base = _y * WIDTH;
         return (_y & 1) ? (base + (WIDTH - 1 - _x)) : (base + _x);
     }
 
-    // ===== Type 2: две 8x8 матрицы подряд (16×8), обе — змейкой =====
+    // ===== Type 2: (nxn)x2 snake =====
     case 2:
     {
         uint16_t row = _y * width;

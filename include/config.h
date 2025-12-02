@@ -11,14 +11,18 @@
 const char *APssid = "Lamp";
 const char *APpassword = "12345678";
 
+// Service icons duaration (ms) configuration
+#define LOAD_SERV_ANIMATION 1000
+#define INFO_SERV_ANIMATION 300
+
 // Server configuration
 #define SERVER_PORT 80
 
 // Effect configuration
-#define MODE_AMOUNT 4
+#define EFFECTS_AMOUNT 4
 uint8_t currentModeID = 0;
 
-// LED matrix configuration
+// LED configuration
 #define LED_TYPE WS2812
 #define LED_PIN D4
 #define LED_COL_ORDER GRB
@@ -26,7 +30,7 @@ uint8_t currentModeID = 0;
 #define WIDTH 16
 #define HEIGHT 8
 #define LED_AMOUNT (WIDTH * HEIGHT)
-#define MATRIX_TYPE 2 // 0-рядками 1-змейка 2-(8х8)х2
+#define MATRIX_TYPE 2 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
 
 // Configuration structure
 struct Config
@@ -45,7 +49,7 @@ struct
     byte brightness = 50;
     byte speed = 30;
     byte scale = 40;
-} modes[MODE_AMOUNT];
+} modes[EFFECTS_AMOUNT];
 
 boolean effectSlowStart = true;
 boolean isOn = false;
