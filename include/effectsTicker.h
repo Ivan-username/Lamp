@@ -3,8 +3,19 @@
 #include "config.h"
 #include "lampEffects.h"
 
-// main effects tick function
+void changeEffect(int id)
+{
+    DEBUG("Effect switched to:");
+    DEBUGLN(id);
+    if (id < 0 || id > EFFECTS_AMOUNT - 1)
+        return;
+    currentEffectID = id;
 
+    effectSlowStart = true;
+    FastLED.clear();
+}
+
+// main effects tick function
 uint32_t effTimer;
 void effectsTick()
 {
@@ -16,15 +27,11 @@ void effectsTick()
     }
     else
     {
-        if (effectSlowStart)
-        {
-            FastLED.clear();
-        }
-        if (millis() - effTimer >= modes[currentModeID].speed)
+        if (millis() - effTimer >= modes[currentEffectID].speed)
         {
             effTimer = millis();
 
-            switch (currentModeID)
+            switch (currentEffectID)
             {
             case 0:
             {
@@ -47,7 +54,7 @@ void effectsTick()
                 break;
             }
             }
-            FastLED.setBrightness(modes[currentModeID].brightness);
+            FastLED.setBrightness(modes[currentEffectID].brightness);
             FastLED.show();
         }
     }

@@ -20,7 +20,8 @@ const char *APpassword = "12345678";
 
 // Effect configuration
 #define EFFECTS_AMOUNT 4
-uint8_t currentModeID = 0;
+uint8_t currentEffectID = 0;
+boolean effectSlowStart = true;
 
 // LED configuration
 #define LED_TYPE WS2812
@@ -51,7 +52,6 @@ struct
     byte scale = 40;
 } modes[EFFECTS_AMOUNT];
 
-boolean effectSlowStart = true;
 boolean isOn = false;
 
 // Objects

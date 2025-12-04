@@ -60,6 +60,6 @@ void setupHttpServer()
     server.on("/icons/reboot.svg", handlePageComponents);
 
     server.begin();
-    iconAnimation(&httpIcon[0][0], CRGB::White, INFO_SERV_ANIMATION);
+    iconAnimation(httpIcon, CRGB::White, INFO_SERV_ANIMATION);
     DEBUGLN("HTTP server started.");
 }

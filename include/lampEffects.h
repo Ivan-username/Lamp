@@ -186,7 +186,7 @@ void rainbowVertical()
     hue += 2;
     FOR_U8_I(0, HEIGHT)
     {
-        CHSV thisColor = CHSV((byte)(hue + i * modes[currentModeID].scale), 255, 255);
+        CHSV thisColor = CHSV((byte)(hue + i * modes[currentEffectID].scale), 255, 255);
         FOR_U8_J(0, WIDTH)
         {
             setPixColorXY(j, i, thisColor);
@@ -202,7 +202,7 @@ void rainbowHorizontal()
     hue += 2;
     FOR_U8_I(0, WIDTH)
     {
-        CHSV thisColor = CHSV((byte)(hue + i * modes[currentModeID].scale), 255, 255);
+        CHSV thisColor = CHSV((byte)(hue + i * modes[currentEffectID].scale), 255, 255);
         FOR_U8_J(0, HEIGHT)
         {
             setPixColorXY(i, j, thisColor);

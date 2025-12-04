@@ -52,7 +52,7 @@ void setup()
 
   // LED setup
   ledsSetup();
-  iconAnimation(&logoIcon[0][0], CRGB::Yellow, 1000); // "Logo"
+  iconAnimation(logoIcon, CRGB::Yellow, 1000); // "Logo"
 
   // WiFi setup
   DEBUGLN("Setting up WiFi: " + config.wifiMode);
