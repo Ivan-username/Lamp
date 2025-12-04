@@ -7,14 +7,14 @@
 
 const uint8_t logoIcon[ICON_SIZE] PROGMEM = // example in BIN
     {
-        0b01111111,
-        0b10000010,
+        0b00111111,
+        0b01000010,
         0b00000010,
         0b00000010,
         0b00000010,
         0b00000010,
-        0b10000010,
-        0b01111100,
+        0b01000010,
+        0b00111100,
 };
 const uint8_t staIcon[ICON_SIZE] PROGMEM = { // example in HEX
     0x18, 0x66, 0x81, 0x3C,

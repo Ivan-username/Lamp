@@ -6,6 +6,7 @@
 #include "httpServer.h"
 #include "webSocketServer.h"
 #include "lampLedUtils.h"
+#include "lampButton.h"
 
 // Main program
 void setup()
@@ -66,8 +67,9 @@ void setup()
 void loop()
 {
   server.handleClient();
-  yield();
   webSocket.loop();
-  yield();
   effectsTick();
+  buttonTick();
+  ESP.wdtFeed(); // пнуть собаку
+  yield();       // ещё раз пнуть собаку
 }

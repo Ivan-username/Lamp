@@ -7,6 +7,7 @@
 #include <ESP8266WebServer.h>
 #include <FileData.h>
 #include <LittleFS.h>
+#include <Button.h>
 
 const char *APssid = "Lamp";
 const char *APpassword = "12345678";
@@ -33,6 +34,9 @@ boolean effectSlowStart = true;
 #define LED_AMOUNT (WIDTH * HEIGHT)
 #define MATRIX_TYPE 2 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
 
+// Button configuration
+#define BTN_PIN D2
+
 // Configuration structure
 struct Config
 {
@@ -58,6 +62,7 @@ boolean isOn = false;
 CRGB leds[LED_AMOUNT];
 WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер на порту 80
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80
+Button btn(BTN_PIN, false);
 
 #define FOR_U8_I(x, y) for (uint8_t i = (x); i < (y); i++)
 #define FOR_U8_J(x, y) for (uint8_t j = (x); j < (y); j++)
