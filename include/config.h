@@ -8,6 +8,9 @@
 #include <FileData.h>
 #include <LittleFS.h>
 #include <Button.h>
+#include "Matrix.h"
+#include "Effect.h"
+#include "Renderer.h"
 
 const char *APssid = "Lamp";
 const char *APpassword = "12345678";
@@ -20,7 +23,7 @@ const char *APpassword = "12345678";
 #define SERVER_PORT 80
 
 // Effect configuration
-#define EFFECTS_AMOUNT 4
+#define EFFECTS_AMOUNT 2
 uint8_t currentEffectID = 0;
 boolean effectSlowStart = true;
 
@@ -35,6 +38,7 @@ boolean effectSlowStart = true;
 #define MATRIX_TYPE 2 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
 
 // Button configuration
+#define USE_BTN 1
 #define BTN_PIN D2
 
 // Configuration structure
@@ -49,12 +53,6 @@ Config config;
 FileData data(&LittleFS, "/data.dat", 'A', &config, sizeof(config));
 
 // Global variables
-struct
-{
-    byte brightness = 50;
-    byte speed = 30;
-    byte scale = 40;
-} modes[EFFECTS_AMOUNT];
 
 boolean isOn = false;
 
@@ -64,6 +62,18 @@ WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket сервер н�
 ESP8266WebServer server(80);                       // HTTP сервер на порту 80
 Button btn(BTN_PIN, false);
 
+#if MATRIX_TYPE == 2
+Matrix *matrix = new DoublePanelSnakeMatrix(WIDTH, HEIGHT, leds);
+#elif MATRIX_TYPE == 1
+Matrix *matrix = new SnakeMatrix(WIDTH, HEIGHT, leds);
+#elif MATRIX_TYPE == 0
+Matrix *matrix = new RowMatrix(WIDTH, HEIGHT, leds);
+#endif
+
+IRenderer *renderer = new MatrixRenderer(matrix);
+
+Effect *effects[EFFECTS_AMOUNT];
+
 #define FOR_U8_I(x, y) for (uint8_t i = (x); i < (y); i++)
 #define FOR_U8_J(x, y) for (uint8_t j = (x); j < (y); j++)
 #define FOR_U8_K(x, y) for (uint8_t k = (x); k < (y); k++)
@@ -71,7 +81,8 @@ Button btn(BTN_PIN, false);
 #define FOR_U16_J(x, y) for (uint16_t j = (x); j < (y); j++)
 #define FOR_U16_K(x, y) for (uint16_t k = (x); k < (y); k++)
 
-#define DEBUG_SERIAL_LAMP 1
+// Debugging
+#define DEBUG_SERIAL_LAMP
 #ifdef DEBUG_SERIAL_LAMP
 #define DEBUGLN(x) Serial.println(x)
 #define DEBUG(x) Serial.print(x)

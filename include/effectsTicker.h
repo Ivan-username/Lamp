@@ -1,7 +1,6 @@
 #pragma once
 
 #include "config.h"
-#include "lampEffects.h"
 
 void changeEffect(int id)
 {
@@ -11,7 +10,7 @@ void changeEffect(int id)
         return;
     currentEffectID = id;
 
-    effectSlowStart = true;
+    effects[currentEffectID]->reset();
     FastLED.clear();
 }
 
@@ -22,39 +21,17 @@ void effectsTick()
 
     if (!isOn)
     {
-        offRoutine();
-        FastLED.show();
+        FastLED.clear();
     }
     else
     {
-        if (millis() - effTimer >= modes[currentEffectID].speed)
+        if (millis() - effTimer >= effects[currentEffectID]->_speed)
         {
             effTimer = millis();
 
-            switch (currentEffectID)
-            {
-            case 0:
-            {
-                lampRoutine();
-                break;
-            }
-            case 1:
-            {
-                fireRoutine();
-                break;
-            }
-            case 2:
-            {
-                rainbowVertical();
-                break;
-            }
-            case 3:
-            {
-                rainbowHorizontal();
-                break;
-            }
-            }
-            FastLED.setBrightness(modes[currentEffectID].brightness);
+            effects[currentEffectID]->routine();
+
+            FastLED.setBrightness(effects[currentEffectID]->_brightness);
             FastLED.show();
         }
     }

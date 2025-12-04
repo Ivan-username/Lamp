@@ -1,7 +1,7 @@
 #pragma once
 
 #include "config.h"
-#include "lampLedUtils.h"
+#include "Matrix.h"
 
 #define ICON_SIZE 8
 
@@ -48,7 +48,7 @@ void iconAnimation(const uint8_t *icon, CRGB color, uint16_t duration)
       // Проверяем бит: 7-й бит — первый пиксель
       bool pixel = line & (1 << (7 - col));
 
-      setPixColorXY(
+      matrix->setPixColorXY(
           startX + col,
           startY + row,
           pixel ? color : CRGB::Black);
@@ -72,6 +72,7 @@ void iconAnimation(const uint8_t *icon, CRGB color, uint16_t duration)
     FastLED.show();
 
     delay(stepTime);
+    yield();
   }
 
   FastLED.clear();

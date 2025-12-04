@@ -5,7 +5,7 @@
 #include "effectsTicker.h"
 #include "httpServer.h"
 #include "webSocketServer.h"
-#include "lampLedUtils.h"
+#include "Matrix.h"
 #include "lampButton.h"
 
 // Main program
@@ -38,6 +38,9 @@ void setup()
     break;
   }
 
+  effects[0] = new Effect(renderer);        // Red
+  effects[1] = new RainbowEffect(renderer); // Rainbow Vertical
+
   DEBUGLN("Data read:");
   DEBUGLN(config.wifiMode);
   DEBUGLN(config.STAssid);
@@ -52,7 +55,9 @@ void setup()
   }
 
   // LED setup
-  ledsSetup();
+  FastLED.addLeds<LED_TYPE, LED_PIN, LED_COL_ORDER>(matrix->_leds, LED_AMOUNT);
+  FastLED.setBrightness(0);
+  FastLED.clear(true);
   iconAnimation(logoIcon, CRGB::Yellow, 1000); // "Logo"
 
   // WiFi setup
@@ -69,7 +74,9 @@ void loop()
   server.handleClient();
   webSocket.loop();
   effectsTick();
+#if (USE_BTN == 1)
   buttonTick();
+#endif
   ESP.wdtFeed(); // пнуть собаку
   yield();       // ещё раз пнуть собаку
 }

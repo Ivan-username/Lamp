@@ -17,9 +17,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
   case WStype_CONNECTED:
   {
     webSocket.sendTXT(num, ("ip:" + (config.wifiMode ? local_ip.toString() : WiFi.localIP().toString())).c_str());
-    webSocket.sendTXT(num, ("brightness:" + String(modes[currentEffectID].brightness)).c_str());
-    webSocket.sendTXT(num, ("scale:" + String(modes[currentEffectID].scale)).c_str());
-    webSocket.sendTXT(num, ("speed:" + String(modes[currentEffectID].speed)).c_str());
+    webSocket.sendTXT(num, ("brightness:" + String(effects[currentEffectID]->_brightness)).c_str());
+    webSocket.sendTXT(num, ("scale:" + String(effects[currentEffectID]->_scale)).c_str());
+    webSocket.sendTXT(num, ("speed:" + String(effects[currentEffectID]->_speed)).c_str());
     webSocket.sendTXT(num, (String("savedSTA:") + config.STAssid + "," + config.STApassword).c_str());
   }
   break;
@@ -36,26 +36,26 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     {
       String val = String((char *)payload).substring(7);
       changeEffect(val.toInt());
-      webSocket.sendTXT(num, ("brightness:" + String(modes[currentEffectID].brightness)).c_str());
-      webSocket.sendTXT(num, ("scale:" + String(modes[currentEffectID].scale)).c_str());
-      webSocket.sendTXT(num, ("speed:" + String(modes[currentEffectID].speed)).c_str());
+      webSocket.sendTXT(num, ("brightness:" + String(effects[currentEffectID]->_brightness)).c_str());
+      webSocket.sendTXT(num, ("scale:" + String(effects[currentEffectID]->_scale)).c_str());
+      webSocket.sendTXT(num, ("speed:" + String(effects[currentEffectID]->_speed)).c_str());
     }
     else if (String((char *)payload).startsWith("brightness:"))
     {
       String val = String((char *)payload).substring(11);
-      modes[currentEffectID].brightness = val.toInt();
+      effects[currentEffectID]->_brightness = val.toInt();
       DEBUGLN("Brightness: " + val);
     }
     else if (String((char *)payload).startsWith("scale:"))
     {
       String val = String((char *)payload).substring(6);
-      modes[currentEffectID].scale = val.toInt();
+      effects[currentEffectID]->_scale = val.toInt();
       DEBUGLN("Scale: " + val);
     }
     else if (String((char *)payload).startsWith("speed:"))
     {
       String val = String((char *)payload).substring(6);
-      modes[currentEffectID].speed = val.toInt();
+      effects[currentEffectID]->_speed = val.toInt();
       DEBUGLN("Speed: " + val);
     }
     else if (String((char *)payload).startsWith("sta:"))

@@ -2,13 +2,13 @@
 
 #include "config.h"
 #include "effectsTicker.h"
-#include "timerMillis.h"
+#include "StepTimerMillis.h"
 
 void buttonTick()
 {
   static bool brDir = true;
   static bool isHoldingProcess = false;
-  static timerMillis stepTmr(50, false);
+  static StepTimerMillis btnStepTimer(50, false);
 
   btn.tick();
 
@@ -46,12 +46,12 @@ void buttonTick()
     if (!isHoldingProcess)
     {
       isHoldingProcess = true;
-      stepTmr.restart();
+      btnStepTimer.restart();
     }
 
-    if (stepTmr.isReady())
+    if (btnStepTimer.isReady())
     {
-      int temp = modes[currentEffectID].brightness;
+      int temp = effects[currentEffectID]->_brightness;
 
       if (brDir)
         temp += 5;
@@ -59,7 +59,7 @@ void buttonTick()
         temp -= 5;
 
       temp = constrain(temp, 1, 255);
-      modes[currentEffectID].brightness = temp;
+      effects[currentEffectID]->_brightness = temp;
     }
   }
   else

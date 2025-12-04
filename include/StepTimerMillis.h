@@ -2,11 +2,11 @@
 
 #include "config.h"
 
-class timerMillis
+class StepTimerMillis
 {
 public:
-  timerMillis() {}
-  timerMillis(uint32_t interval, bool active = false)
+  StepTimerMillis() {}
+  StepTimerMillis(uint32_t interval, bool active = false)
   {
     _interval = interval;
     reset();
