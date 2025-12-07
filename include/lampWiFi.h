@@ -3,93 +3,70 @@
 #include "config.h"
 #include "iconViewer.h"
 
-static byte reconnectionTries = 10;
-
-IPAddress local_ip(192, 168, 4, 1);
-IPAddress gateway(192, 168, 4, 1);
-IPAddress subnet(255, 255, 255, 0);
-
-void updateAP()
+class LampWiFi
 {
-    if (config.wifiMode == 1)
+public:
+    LampWiFi(uint8_t wifiMode,
+             String STAssid,
+             String STApassword,
+             IPAddress local_ip,
+             IPAddress gateway,
+             IPAddress subnet,
+             String APssid = "LampAP",
+             String APpassword = "31415926")
+        : _wifiMode(wifiMode),
+          _STAssid(STAssid),
+          _STApassword(STApassword),
+          _local_ip(local_ip),
+          _gateway(gateway),
+          _subnet(subnet),
+          _APssid(APssid),
+          _APpassword(APpassword)
     {
-        iconAnimation(apIcon, CRGB::Green, INFO_SERV_ANIMATION);
-        return;
     }
 
-    DEBUGLN("Switched to ap mode");
-    config.wifiMode = 1;
-    data.updateNow();
-    iconAnimation(rebootIcon, CRGB::Red, LOAD_SERV_ANIMATION);
-    ESP.restart();
-}
-
-void updateSTA(String ssid, String password)
-{
-    DEBUGLN("Recived wifi config:" + ssid + ":" + password);
-
-    if (config.wifiMode == 0 && (ssid.isEmpty() || password.isEmpty()))
+    void initWiFi()
     {
-        iconAnimation(staIcon, CRGB::Green, INFO_SERV_ANIMATION);
-        return;
-    }
-    else if (config.wifiMode == 1 && (ssid.isEmpty() || password.isEmpty()))
-    {
-        config.wifiMode = 0;
-        data.updateNow();
-        DEBUGLN("STA mode with earlier saved config");
-        iconAnimation(rebootIcon, CRGB::Red, LOAD_SERV_ANIMATION);
-        ESP.restart();
+        if (_wifiMode)
+            setAPMode();
+        else
+            setSTAMode();
     }
 
-    config.wifiMode = 0;
-    config.STAssid = ssid;
-    config.STApassword = password;
-    data.updateNow();
-    iconAnimation(rebootIcon, CRGB::Red, LOAD_SERV_ANIMATION);
-    ESP.restart();
-}
-
-void setupAPMode()
-{
-
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(APssid, APpassword);
-    WiFi.softAPConfig(local_ip, gateway, subnet);
-
-    DEBUG("Access Point IP address: ");
-    DEBUGLN(WiFi.softAPIP());
-    iconAnimation(apIcon, CRGB::Green, INFO_SERV_ANIMATION);
-}
-
-void setupSTAMode()
-{
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(config.STAssid, config.STApassword);
-
-    while (--reconnectionTries && WiFi.status() != WL_CONNECTED)
+    void setAPMode()
     {
-        iconAnimation(staIcon, CRGB::White, LOAD_SERV_ANIMATION);
-        DEBUGLN(".");
+        WiFi.mode(WIFI_AP);
+        WiFi.softAP(_APssid, _APpassword);
+        WiFi.softAPConfig(_local_ip, _gateway, _subnet);
     }
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        iconAnimation(staIcon, CRGB::Green, INFO_SERV_ANIMATION);
-        DEBUG("IP address: ");
-        DEBUGLN(WiFi.localIP());
-    }
-    else
-    {
-        iconAnimation(staIcon, CRGB::Red, INFO_SERV_ANIMATION);
-        WiFi.disconnect();
-        setupAPMode();
-    }
-}
 
-void setupWiFi()
-{
-    if (config.wifiMode == 0)
-        setupSTAMode();
-    else
-        setupAPMode();
-}
+    void setSTAMode()
+    {
+        WiFi.mode(WIFI_STA);
+        WiFi.begin(_STAssid, _STApassword);
+    }
+
+    wl_status_t getSTAstatus()
+    {
+        return WiFi.status();
+    }
+
+    IPAddress getSTALocalIP()
+    {
+        return WiFi.localIP();
+    }
+
+    IPAddress getAPLocalIP()
+    {
+        return WiFi.softAPIP();
+    }
+
+    uint8_t _wifiMode;
+    String _STAssid;
+    String _STApassword;
+    IPAddress _local_ip;
+    IPAddress _gateway;
+    IPAddress _subnet;
+    String _APssid;
+    String _APpassword;
+};

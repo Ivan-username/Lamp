@@ -3,22 +3,32 @@
 #include "config.h"
 #include "Renderer.h"
 
-// ============ EFFECT =============
+// ============ BASIC EFFECT =============
 class Effect
 {
 public:
   Effect(IRenderer *renderer) : _renderer(renderer) {}
   virtual ~Effect() = default;
 
+  // virtual void reset() = 0;
+
+  virtual void setBrightness(uint8_t b)
+  {
+    _brightness = b;
+  }
+  virtual void setSpeed(uint8_t s)
+  {
+    _speed = s;
+  }
+  virtual void setScale(uint8_t sc)
+  {
+    _scale = sc;
+  }
+
   virtual void routine()
   {
     runTestDot();
   };
-  virtual void reset()
-  {
-    testX = 0;
-    _renderer->fill(CRGB::Black);
-  }
 
   uint8_t _brightness = 50;
   uint8_t _speed = 30;

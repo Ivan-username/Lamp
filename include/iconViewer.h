@@ -32,48 +32,48 @@ const uint8_t rebootIcon[ICON_SIZE] PROGMEM = {
     0x08, 0x3C, 0x48, 0x40,
     0x42, 0x42, 0x3C, 0x00};
 
-void iconAnimation(const uint8_t *icon, CRGB color, uint16_t duration)
-{
-  const uint8_t startX = WIDTH / 2 - 4;
-  const uint8_t startY = HEIGHT / 2 - 4;
+// void iconAnimation(const uint8_t *icon, CRGB color, uint16_t duration)
+// {
+//   const uint8_t startX = WIDTH / 2 - 4;
+//   const uint8_t startY = HEIGHT / 2 - 4;
 
-  FastLED.clear();
+//   FastLED.clear();
 
-  for (uint8_t row = 0; row < ICON_SIZE; row++)
-  {
-    uint8_t line = pgm_read_byte(icon + (ICON_SIZE - 1 - row));
+//   for (uint8_t row = 0; row < ICON_SIZE; row++)
+//   {
+//     uint8_t line = pgm_read_byte(icon + (ICON_SIZE - 1 - row));
 
-    for (uint8_t col = 0; col < ICON_SIZE; col++)
-    {
-      // Проверяем бит: 7-й бит — первый пиксель
-      bool pixel = line & (1 << (7 - col));
+//     for (uint8_t col = 0; col < ICON_SIZE; col++)
+//     {
+//       // Проверяем бит: 7-й бит — первый пиксель
+//       bool pixel = line & (1 << (7 - col));
 
-      matrix->setPixColorXY(
-          startX + col,
-          startY + row,
-          pixel ? color : CRGB::Black);
-    }
-  }
+//       matrix->setPixColorXY(
+//           startX + col,
+//           startY + row,
+//           pixel ? color : CRGB::Black);
+//     }
+//   }
 
-  FastLED.show();
-  yield();
+//   FastLED.show();
+//   yield();
 
-  const uint16_t steps = 200;
-  const float stepTime = (float)duration / steps;
+//   const uint16_t steps = 200;
+//   const float stepTime = (float)duration / steps;
 
-  for (uint16_t i = 0; i < steps; i++)
-  {
-    float t = (float)i / (steps - 1);
-    float wave = sin(PI * t);
+//   for (uint16_t i = 0; i < steps; i++)
+//   {
+//     float t = (float)i / (steps - 1);
+//     float wave = sin(PI * t);
 
-    uint8_t brightness = (uint8_t)(wave * 50);
+//     uint8_t brightness = (uint8_t)(wave * 50);
 
-    FastLED.setBrightness(brightness);
-    FastLED.show();
+//     FastLED.setBrightness(brightness);
+//     FastLED.show();
 
-    delay(stepTime);
-    yield();
-  }
+//     delay(stepTime);
+//     yield();
+//   }
 
-  FastLED.clear();
-}
+//   FastLED.clear();
+// }
