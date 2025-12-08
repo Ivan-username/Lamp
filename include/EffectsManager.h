@@ -2,31 +2,38 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include "StepTimer.h"
 
 class EffectsManager
 {
 public:
     EffectsManager(uint8_t amount, Effect **effects)
-        : _amount(amount), _effects(effects) {}
+        : _amount(amount), _effects(effects), speedTimer(50, true) {}
 
     void tick()
     {
-        // add speed timer
-        _effects[_current]->_speed;
-        //
-
-        if (_amount == 0)
-            return;
-        _effects[_current]->routine();
-        FastLED.show();
+        if (speedTimer.isReady() && _power)
+        {
+            if (_amount == 0)
+                return;
+            _effects[_current]->routine();
+            FastLED.show();
+            speedTimer.restart();
+        }
     }
 
-    void applyState(uint8_t eff, uint8_t br, uint8_t sp, uint8_t sc)
+    void switchPower()
     {
-        setEffect(eff);
-        _effects[_current]->setBrightness(br);
-        _effects[_current]->setSpeed(sp);
-        _effects[_current]->setScale(sc);
+        _power = !_power;
+        if (!_power)
+            FastLED.clear(true);
+    }
+    bool getPower() const { return _power; }
+
+    void applyEffect()
+    {
+        setEffect(_current);
+        updateSpeedTimer(_effects[_current]->data.speed);
     }
 
     void setEffect(uint8_t id)
@@ -34,8 +41,8 @@ public:
         if (id >= _amount)
             return;
         _current = id;
-        // _effects[_current]->reset();
         FastLED.clear(true);
+        updateSpeedTimer(_effects[_current]->data.speed);
     }
 
     void setBrightness(uint8_t b)
@@ -43,12 +50,36 @@ public:
         _effects[_current]->setBrightness(b);
         FastLED.setBrightness(b);
     }
-    void setSpeed(uint8_t s) { _effects[_current]->setSpeed(s); }
+
+    void setSpeed(uint8_t s)
+    {
+        _effects[_current]->setSpeed(s);
+        updateSpeedTimer(s);
+    }
+
     void setScale(uint8_t sc) { _effects[_current]->setScale(sc); }
 
+    void updateSpeedTimer(uint32_t interval)
+    {
+        speedTimer.setInterval(interval);
+        speedTimer.force();
+    }
+
+    void getCurrentEffectData(Effect::LampData &data)
+    {
+        data = _effects[_current]->data;
+    }
+    void getCurrentEffect(uint8_t &id)
+    {
+        id = _current;
+    }
+
 private:
+    bool _power = false;
+
     uint8_t _amount;
     uint8_t _current = 0;
 
     Effect **_effects;
+    StepTimer speedTimer;
 };

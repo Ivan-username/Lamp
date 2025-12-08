@@ -44,11 +44,11 @@ LampWiFi lampWiFi(
 LampHttpServer lampHttpServer(80);
 
 #if MATRIX_TYPE == 2
-Matrix *matrix = new DoublePanelSnakeMatrix(WIDTH, HEIGHT, leds);
+Matrix *matrix = new DoublePanelSnakeMatrix(leds, WIDTH, HEIGHT);
 #elif MATRIX_TYPE == 1
-Matrix *matrix = new SnakeMatrix(WIDTH, HEIGHT, leds);
+Matrix *matrix = new SnakeMatrix(leds, WIDTH, HEIGHT);
 #elif MATRIX_TYPE == 0
-Matrix *matrix = new RowMatrix(WIDTH, HEIGHT, leds);
+Matrix *matrix = new RowMatrix(leds, WIDTH, HEIGHT);
 #endif
 
 IRenderer *renderer = new MatrixRenderer(matrix);

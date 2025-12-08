@@ -1,6 +1,5 @@
 
 #pragma once
-#include "LampState.h"
 #include "EffectsManager.h"
 #include "EventBus.h"
 
@@ -16,14 +15,16 @@ public:
   {
     bus.subscribe([this](const Event &ev)
                   { handleEvent(ev); });
+    bus.publish({Event::Init});
   }
 
-  const LampState &getState() const { return state; }
+  // const LampState &getState() const { return state; }
 
 private:
-  LampState state;
   EventBus &bus;
   EffectsManager &effectsManager;
+  Effect::LampData data;
+  uint8_t currentEffect = 0;
 
   void handleEvent(const Event &ev)
   {
@@ -31,57 +32,57 @@ private:
     if (ev.type == Event::StateChanged)
       return;
 
+    effectsManager.getCurrentEffect(currentEffect);
+    effectsManager.getCurrentEffectData(data);
+
     switch (ev.type)
     {
+    case Event::Init:
+
+      effectsManager.applyEffect();
+      break;
+
     case Event::TogglePower:
-      state.isOn = !state.isOn;
-      if (!state.isOn)
-        FastLED.clear(true);
-      DEBUGLN(String("Power ") + (state.isOn ? "ON" : "OFF"));
+      effectsManager.switchPower();
+      DEBUGLN(String("Power ") + (effectsManager.getPower() ? "ON" : "OFF"));
       break;
 
     case Event::SetEffect:
-      state.currentEffect = ev.intValue;
-      effectsManager.setEffect(state.currentEffect);
-      DEBUGLN("Set effect to " + String(state.currentEffect));
-      break;
+      if (ev.strValue == "+")
+        currentEffect = (currentEffect + ev.intValue) % EFFECTS_AMOUNT;
+      else if (ev.strValue == "-")
+        currentEffect = (currentEffect == 0
+                             ? EFFECTS_AMOUNT - 1
+                             : currentEffect - ev.intValue);
+      else
+        currentEffect = constrain(ev.intValue, 0, EFFECTS_AMOUNT - 1);
 
-    case Event::NextEffect:
-      state.currentEffect = (state.currentEffect + 1) % EFFECTS_AMOUNT;
-      effectsManager.setEffect(state.currentEffect);
-      DEBUGLN("Set effect to " + String(state.currentEffect));
-      break;
-
-    case Event::PrevEffect:
-      state.currentEffect = (state.currentEffect == 0
-                                 ? EFFECTS_AMOUNT - 1
-                                 : state.currentEffect - 1);
-      effectsManager.setEffect(state.currentEffect);
-      DEBUGLN("Set effect to " + String(state.currentEffect));
+      effectsManager.setEffect(currentEffect);
+      DEBUGLN("Set effect to " + String(currentEffect));
       break;
 
     case Event::SetBrightness:
       if (ev.strValue == "+")
-        state.brightness = constrain(state.brightness + ev.intValue, 1, 255);
+        data.brightness = constrain(data.brightness + ev.intValue, 1, 255);
       else if (ev.strValue == "-")
-        state.brightness = constrain(state.brightness - ev.intValue, 1, 255);
+        data.brightness = constrain(data.brightness - ev.intValue, 1, 255);
       else
-        state.brightness = constrain(ev.intValue, 1, 255);
+        data.brightness = constrain(ev.intValue, 1, 255);
 
-      effectsManager.setBrightness(state.brightness);
-      DEBUGLN("Set brightness to " + String(state.brightness));
+      effectsManager.setBrightness(data.brightness);
+      DEBUGLN("Set brightness to " + String(data.brightness));
       break;
 
     case Event::SetSpeed:
-      state.speed = constrain(ev.intValue, 1, 255);
-      effectsManager.setSpeed(state.speed);
-      DEBUGLN("Set speed to " + String(state.speed));
+      data.speed = constrain(ev.intValue, 1, 255);
+      effectsManager.setSpeed(data.speed);
+      DEBUGLN("Set speed to " + String(data.speed));
       break;
 
     case Event::SetScale:
-      state.scale = constrain(ev.intValue, 1, 255);
-      effectsManager.setScale(state.scale);
-      DEBUGLN("Set scale to " + String(state.scale));
+      data.scale = constrain(ev.intValue, 1, 255);
+      effectsManager.setScale(data.scale);
+      DEBUGLN("Set scale to " + String(data.scale));
       break;
 
     default:

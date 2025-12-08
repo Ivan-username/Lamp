@@ -8,10 +8,9 @@ struct Event
 {
   enum Type
   {
+    Init,
     TogglePower,
     SetEffect,
-    NextEffect,
-    PrevEffect,
     SetBrightness,
     SetSpeed,
     SetScale,

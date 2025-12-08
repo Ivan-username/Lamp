@@ -16,9 +16,9 @@ public:
     if (c == 1)
       bus.publish({Event::TogglePower});
     if (c == 2)
-      bus.publish({Event::NextEffect});
+      bus.publish({Event::SetEffect, 1, "+"});
     if (c == 3)
-      bus.publish({Event::PrevEffect});
+      bus.publish({Event::SetEffect, 1, "-"});
 
     if (btn.isHold())
     {

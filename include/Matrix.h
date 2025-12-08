@@ -4,8 +4,8 @@
 class Matrix
 {
 public:
-    Matrix(uint16_t w, uint16_t h, CRGB *extLeds)
-        : _width(w), _height(h), _leds(extLeds)
+    Matrix(CRGB *extLeds, uint16_t w, uint16_t h)
+        : _leds(extLeds), _width(w), _height(h)
     {
         _ledsAmount = w * h;
     }
@@ -52,8 +52,8 @@ protected:
 class RowMatrix : public Matrix
 {
 public:
-    RowMatrix(uint16_t w, uint16_t h, CRGB *extLeds)
-        : Matrix(w, h, extLeds) {}
+    RowMatrix(CRGB *extLeds, uint16_t w, uint16_t h)
+        : Matrix(extLeds, w, h) {}
 
     uint16_t getPixIndex(int16_t x, int16_t y) const override
     {
@@ -66,8 +66,8 @@ public:
 class SnakeMatrix : public Matrix
 {
 public:
-    SnakeMatrix(uint16_t w, uint16_t h, CRGB *extLeds)
-        : Matrix(w, h, extLeds) {}
+    SnakeMatrix(CRGB *extLeds, uint16_t w, uint16_t h)
+        : Matrix(extLeds, w, h) {}
 
     uint16_t getPixIndex(int16_t x, int16_t y) const override
     {
@@ -81,8 +81,8 @@ public:
 class DoublePanelSnakeMatrix : public Matrix
 {
 public:
-    DoublePanelSnakeMatrix(uint16_t w, uint16_t h, CRGB *extLeds)
-        : Matrix(w, h, extLeds)
+    DoublePanelSnakeMatrix(CRGB *extLeds, uint16_t w, uint16_t h)
+        : Matrix(extLeds, w, h)
     {
         _halfWidth = w / 2;
         _panelSize = _halfWidth * h;

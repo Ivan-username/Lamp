@@ -83,7 +83,6 @@
 #include "config.h"
 #include <WebSocketsServer.h>
 #include "EventBus.h"
-#include "LampState.h"
 
 class WebSocketController
 {
@@ -135,11 +134,20 @@ private:
     else if (s.startsWith("effect:"))
       bus.publish({Event::SetEffect, s.substring(7).toInt()});
     else if (s.startsWith("brightness:"))
-      bus.publish({Event::SetBrightness, s.substring(11).toInt()});
+    {
+      uint8_t val = s.substring(11).toInt();
+      bus.publish({Event::SetBrightness, map(val, 1, 100, 1, 255)});
+    }
     else if (s.startsWith("speed:"))
-      bus.publish({Event::SetSpeed, s.substring(6).toInt()});
+    {
+      uint8_t val = s.substring(6).toInt();
+      bus.publish({Event::SetSpeed, map(val, 1, 100, 1, 50)});
+    }
     else if (s.startsWith("scale:"))
-      bus.publish({Event::SetScale, s.substring(6).toInt()});
+    {
+      uint8_t val = s.substring(6).toInt();
+      bus.publish({Event::SetScale, map(val, 1, 100, 1, 100)});
+    }
     else if (s.startsWith("sta:"))
       bus.publish({Event::WiFiSTAUpdated, 0, s.substring(4)});
     else if (s.startsWith("ap:"))

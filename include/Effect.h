@@ -14,15 +14,15 @@ public:
 
   virtual void setBrightness(uint8_t b)
   {
-    _brightness = b;
+    data.brightness = b;
   }
   virtual void setSpeed(uint8_t s)
   {
-    _speed = s;
+    data.speed = s;
   }
   virtual void setScale(uint8_t sc)
   {
-    _scale = sc;
+    data.scale = sc;
   }
 
   virtual void routine()
@@ -30,9 +30,12 @@ public:
     runTestDot();
   };
 
-  uint8_t _brightness = 50;
-  uint8_t _speed = 30;
-  uint8_t _scale = 40;
+  struct LampData
+  {
+    uint8_t brightness = 30;
+    uint8_t speed = 30;
+    uint8_t scale = 30;
+  } data;
 
 protected:
   IRenderer *_renderer;
@@ -62,7 +65,7 @@ public:
     static uint8_t hue = 0;
     for (int y = 0; y < _renderer->height(); y++)
     {
-      CHSV thisColor = CHSV((byte)(hue + y * _scale), 255, 255);
+      CHSV thisColor = CHSV((byte)(hue + y * data.scale), 255, 255);
       for (int x = 0; x < _renderer->width(); x++)
       {
         _renderer->setPixel(x, y, thisColor);
