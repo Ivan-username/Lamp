@@ -1,7 +1,6 @@
 #pragma once
 
 #include "config.h"
-#include "Matrix.h"
 
 #define ICON_SIZE 8
 

@@ -1,52 +1,42 @@
 #pragma once
 
 #include "config.h"
-#include "Renderer.h"
+#include "LedConfiguration.h"
 
 // ============ BASIC EFFECT =============
 class Effect
 {
 public:
-  Effect(IRenderer *renderer) : _renderer(renderer) {}
-  virtual ~Effect() = default;
-
-  // virtual void reset() = 0;
-
-  virtual void setBrightness(uint8_t b)
-  {
-    data.brightness = b;
-  }
-  virtual void setSpeed(uint8_t s)
-  {
-    data.speed = s;
-  }
-  virtual void setScale(uint8_t sc)
-  {
-    data.scale = sc;
-  }
-
-  virtual void routine()
-  {
-    runTestDot();
-  };
-
-  struct LampData
+  struct EffectData
   {
     uint8_t brightness = 30;
     uint8_t speed = 30;
     uint8_t scale = 30;
   } data;
 
+  Effect(LedConfiguration &ledConf) : ledConfig(ledConf) {}
+  virtual ~Effect() = default;
+
+  // virtual void reset() = 0;
+
+  virtual void setBrightness(uint8_t b) { data.brightness = b; }
+
+  virtual void setSpeed(uint8_t s) { data.speed = s; }
+
+  virtual void setScale(uint8_t sc) { data.scale = sc; }
+
+  virtual void routine() { runTestDot(); };
+
 protected:
-  IRenderer *_renderer;
+  LedConfiguration &ledConfig;
 
   void runTestDot()
   {
-    _renderer->fill(CRGB::Black);
-    _renderer->setPixel(testX, 0, CRGB::Red);
+    ledConfig.fillAll(CRGB::Black);
+    ledConfig.setPixColorXY(testX, 0, CRGB::Red);
 
     testX++;
-    if (testX >= _renderer->width())
+    if (testX >= ledConfig.getWidth())
       testX = 0;
   }
 
@@ -57,18 +47,18 @@ protected:
 class RainbowEffect : public Effect
 {
 public:
-  RainbowEffect(IRenderer *r) : Effect(r) {}
+  RainbowEffect(LedConfiguration &ledConf) : Effect(ledConf) {}
 
   void routine() override
   {
 
     static uint8_t hue = 0;
-    for (int y = 0; y < _renderer->height(); y++)
+    for (int y = 0; y < ledConfig.getHeight(); y++)
     {
       CHSV thisColor = CHSV((byte)(hue + y * data.scale), 255, 255);
-      for (int x = 0; x < _renderer->width(); x++)
+      for (int x = 0; x < ledConfig.getWidth(); x++)
       {
-        _renderer->setPixel(x, y, thisColor);
+        ledConfig.setPixColorXY(x, y, thisColor);
       }
     }
     hue++;

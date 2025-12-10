@@ -1,19 +1,18 @@
 #pragma once
 
 #include "config.h"
-#include "iconViewer.h"
 
-class LampWiFi
+class WiFiController
 {
 public:
-    LampWiFi(uint8_t wifiMode,
-             String STAssid,
-             String STApassword,
-             IPAddress local_ip,
-             IPAddress gateway,
-             IPAddress subnet,
-             String APssid = "LampAP",
-             String APpassword = "31415926")
+    WiFiController(uint8_t wifiMode,
+                   String STAssid,
+                   String STApassword,
+                   IPAddress local_ip,
+                   IPAddress gateway,
+                   IPAddress subnet,
+                   String APssid = "LampAP",
+                   String APpassword = "31415926")
         : _wifiMode(wifiMode),
           _STAssid(STAssid),
           _STApassword(STApassword),

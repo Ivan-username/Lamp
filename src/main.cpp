@@ -1,35 +1,25 @@
 
 #include "config.h"
 
-#include "LampWiFi.h"
-#include "LampHttpServer.h"
+#include "WiFiController.h"
+#include "HttpController.h"
 #include "WebSocketController.h"
-#include "Matrix.h"
-#include "Renderer.h"
 #include "Effect.h"
-#include "EffectsManager.h"
+#include "EffectsController.h"
 #include "EventBus.h"
 #include "LampCore.h"
 #include "Button.h"
 #include "ButtonController.h"
+#include "LedConfiguration.h"
 
-EventBus bus;
-// effects
 Effect *effects[EFFECTS_AMOUNT];
-EffectsManager effectsManager(EFFECTS_AMOUNT, effects);
+EffectsController effectsManager(EFFECTS_AMOUNT, effects);
 
-// core
-LampCore core(bus, effectsManager);
+ButtonController lampBtn(BTN_PIN, false);
 
-// controllers
-Button btn(BTN_PIN, false);
-ButtonController btnCtrl(btn, bus);
-WebSocketController wsCtrl(bus, 81);
-
-// Objects
 CRGB leds[LED_AMOUNT];
 
-LampWiFi lampWiFi(
+WiFiController lampWiFi(
     0, // 0 - STA, 1 - AP
     // ========== STA mode settings ==========
     "keenuka",
@@ -41,23 +31,23 @@ LampWiFi lampWiFi(
     "Lamp",
     "31415926");
 
-LampHttpServer lampHttpServer(80);
+HttpController lampHttpServer(80);
+WebSocketController lampWebSocket(81);
 
 #if MATRIX_TYPE == 2
-Matrix *matrix = new DoublePanelSnakeMatrix(leds, WIDTH, HEIGHT);
+DoublePanelSnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
 #elif MATRIX_TYPE == 1
-Matrix *matrix = new SnakeMatrix(leds, WIDTH, HEIGHT);
+SnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
 #elif MATRIX_TYPE == 0
-Matrix *matrix = new RowMatrix(leds, WIDTH, HEIGHT);
+RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
-IRenderer *renderer = new MatrixRenderer(matrix);
+LampCore core;
 
-// Main program
 void setup()
 {
-  effects[0] = new Effect(renderer);        // Red
-  effects[1] = new RainbowEffect(renderer); // Rainbow Vertical
+  effects[0] = new Effect(ledConfig);        // Red
+  effects[1] = new RainbowEffect(ledConfig); // Rainbow Vertical
 
   Serial.begin(115200);
   delay(2000);
@@ -73,29 +63,23 @@ void setup()
   }
 
   // LED setup
-  FastLED.addLeds<LED_TYPE, LED_PIN, LED_COL_ORDER>(matrix->_leds, LED_AMOUNT);
+  FastLED.addLeds<LED_TYPE, LED_PIN, LED_COL_ORDER>(leds, LED_AMOUNT);
   FastLED.setBrightness(0);
   FastLED.clear(true);
 
   // Check led buffers pointers
   Serial.println((uint32_t)leds, HEX);
-  Serial.println((uint32_t)matrix->_leds, HEX);
+  Serial.println((uint32_t)ledConfig._leds, HEX);
 
   lampWiFi.initWiFi();
   lampHttpServer.initHttpServer();
-
-  wsCtrl.init();
-  core.init();
 }
 
 void loop()
 {
-  btnCtrl.tick();
-  yield();
-  wsCtrl.tick();
-  yield();
+
   effectsManager.tick();
-  yield();
+
   lampHttpServer.tick();
   yield();
 }

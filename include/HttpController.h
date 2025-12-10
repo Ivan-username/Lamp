@@ -1,11 +1,11 @@
 #pragma once
 
 #include "config.h"
-#include "LampWiFi.h"
-class LampHttpServer
+#include "WiFiController.h"
+class HttpController
 {
 public:
-    LampHttpServer(uint16_t port = 80)
+    HttpController(uint16_t port = 80)
         : _server(port)
     {
     }

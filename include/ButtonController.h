@@ -1,30 +1,33 @@
 #pragma once
 #include "EventBus.h"
 #include "StepTimer.h"
+#include "Button.h"
 
 class ButtonController
 {
 public:
-  ButtonController(Button &button, EventBus &bus)
-      : btn(button), bus(bus), holdTimer(50, false) {}
+  ButtonController(uint8_t pin = D2, bool pullup)
+      : btn(pin, pullup), holdTimer(50, false) {}
 
   void tick()
   {
     btn.tick();
 
     uint8_t c = btn.getClicks();
-    if (c == 1)
-      bus.publish({Event::TogglePower});
-    if (c == 2)
-      bus.publish({Event::SetEffect, 1, "+"});
-    if (c == 3)
-      bus.publish({Event::SetEffect, 1, "-"});
+    switch (c)
+    {
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    }
 
     if (btn.isHold())
     {
       if (holdTimer.isReady())
       {
-        bus.publish({Event::SetBrightness, 5, brDirection ? "+" : "-"});
       }
       brDirChanged = false;
     }
@@ -42,7 +45,6 @@ public:
 private:
   bool brDirection = true;
   bool brDirChanged = true;
-  Button &btn;
-  EventBus &bus;
+  Button btn;
   StepTimer holdTimer;
 };

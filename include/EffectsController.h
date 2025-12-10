@@ -3,11 +3,12 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include "StepTimer.h"
+#include "Effect.h"
 
-class EffectsManager
+class EffectsController
 {
 public:
-    EffectsManager(uint8_t amount, Effect **effects)
+    EffectsController(uint8_t amount, Effect **effects)
         : _amount(amount), _effects(effects), speedTimer(50, true) {}
 
     void tick()
@@ -65,7 +66,7 @@ public:
         speedTimer.force();
     }
 
-    void getCurrentEffectData(Effect::LampData &data)
+    void getCurrentEffectData(Effect::EffectData &data)
     {
         data = _effects[_current]->data;
     }
