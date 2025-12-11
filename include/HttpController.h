@@ -44,6 +44,8 @@ public:
                    { handlePageComponents(); });
 
         _server.begin();
+
+        // queue message
     }
 
     void tick()

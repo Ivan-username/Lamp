@@ -6,18 +6,20 @@
 #include "WebSocketController.h"
 #include "Effect.h"
 #include "EffectsController.h"
-#include "EventBus.h"
+#include "EventQueue.h"
 #include "LampCore.h"
 #include "Button.h"
 #include "ButtonController.h"
 #include "LedConfiguration.h"
 
+CRGB leds[LED_AMOUNT];
+
+EventQueue eventQueue;
+
 Effect *effects[EFFECTS_AMOUNT];
 EffectsController effectsManager(EFFECTS_AMOUNT, effects);
 
 ButtonController lampBtn(BTN_PIN, false);
-
-CRGB leds[LED_AMOUNT];
 
 WiFiController lampWiFi(
     0, // 0 - STA, 1 - AP
@@ -29,7 +31,8 @@ WiFiController lampWiFi(
     IPAddress(192, 168, 4, 1),
     IPAddress(255, 255, 255, 0),
     "Lamp",
-    "31415926");
+    "31415926",
+    eventQueue);
 
 HttpController lampHttpServer(80);
 WebSocketController lampWebSocket(81);
@@ -42,7 +45,7 @@ SnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
 RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
-LampCore core;
+LampCore core(eventQueue);
 
 void setup()
 {

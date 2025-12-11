@@ -57,17 +57,22 @@ private:
   }
   virtual void onConnect(uint8_t clientId, IPAddress ip)
   {
+    // queue message
   }
 
   virtual void onDisconnect(uint8_t clientId)
   {
+    // queue message
   }
 
   virtual void onMessage(uint8_t clientId, uint8_t *payload, size_t length)
   {
+
+    // queue message
   }
 
   virtual void onBinaryMessage(uint8_t clientId, uint8_t *payload, size_t length)
   {
+    // queue message
   }
 };

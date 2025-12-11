@@ -17,8 +17,6 @@ public:
   Effect(LedConfiguration &ledConf) : ledConfig(ledConf) {}
   virtual ~Effect() = default;
 
-  // virtual void reset() = 0;
-
   virtual void setBrightness(uint8_t b) { data.brightness = b; }
 
   virtual void setSpeed(uint8_t s) { data.speed = s; }
@@ -26,6 +24,8 @@ public:
   virtual void setScale(uint8_t sc) { data.scale = sc; }
 
   virtual void routine() { runTestDot(); };
+
+  // virtual void reset() = 0;
 
 protected:
   LedConfiguration &ledConfig;

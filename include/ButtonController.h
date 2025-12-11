@@ -1,12 +1,12 @@
 #pragma once
-#include "EventBus.h"
+#include "EventQueue.h"
 #include "StepTimer.h"
 #include "Button.h"
 
 class ButtonController
 {
 public:
-  ButtonController(uint8_t pin = D2, bool pullup)
+  ButtonController(uint8_t pin = D2, bool pullup = true)
       : btn(pin, pullup), holdTimer(50, false) {}
 
   void tick()
@@ -17,6 +17,7 @@ public:
     switch (c)
     {
     case 1:
+      // queue message
       break;
     case 2:
       break;
