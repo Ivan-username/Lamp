@@ -23,33 +23,62 @@ public:
         }
     }
 
+    // ============ Power Control ============
     void switchPower()
     {
         _power = !_power;
         if (!_power)
             FastLED.clear(true);
+        else
+            applyEffect();
     }
     bool getPower() const { return _power; }
 
+    // ============ Effect Control ============
     void applyEffect()
     {
-        setEffect(_current);
-        updateSpeedTimer(_effects[_current]->data.speed);
-    }
-
-    void setEffect(uint8_t id)
-    {
-        if (id >= _amount)
-            return;
-        _current = id;
         FastLED.clear(true);
+        setBrightness(_effects[_current]->data.brightness);
         updateSpeedTimer(_effects[_current]->data.speed);
     }
+    void applyEffect(uint8_t index)
+    {
+        if (index >= _amount)
+            return;
+        _current = index;
+        FastLED.clear(true);
 
+        setBrightness(_effects[index]->data.brightness);
+        updateSpeedTimer(_effects[index]->data.speed);
+    }
+
+    uint8_t getCurrentEffectIndex()
+    {
+        return _current;
+    }
+
+    void setPrevEffect()
+    {
+        applyEffect((_current + _amount - 1) % _amount);
+    }
+    void setNextEffect()
+    {
+        applyEffect((_current + 1) % _amount);
+    }
+
+    // ============ Effect Parameters Control ============
     void setBrightness(uint8_t b)
     {
         _effects[_current]->setBrightness(b);
         FastLED.setBrightness(b);
+    }
+    void changeBrightness(int8_t delta)
+    {
+        uint8_t newBr = constrain(
+            (int16_t)_effects[_current]->data.brightness + delta,
+            1,
+            255);
+        setBrightness(newBr);
     }
 
     void setSpeed(uint8_t s)
@@ -60,22 +89,21 @@ public:
 
     void setScale(uint8_t sc) { _effects[_current]->setScale(sc); }
 
+    // ============ Get Current Effect Data ============
+    Effect::EffectData getCurrentEffectData()
+    {
+        return _effects[_current]->data;
+    }
+
+private:
+    // ============ Internal Helpers ============
+
     void updateSpeedTimer(uint32_t interval)
     {
         speedTimer.setInterval(interval);
         speedTimer.force();
     }
 
-    void getCurrentEffectData(Effect::EffectData &data)
-    {
-        data = _effects[_current]->data;
-    }
-    void getCurrentEffect(uint8_t &id)
-    {
-        id = _current;
-    }
-
-private:
     bool _power = false;
 
     uint8_t _amount;

@@ -6,8 +6,8 @@
 class ButtonController
 {
 public:
-  ButtonController(uint8_t pin = D2, bool pullup = true)
-      : btn(pin, pullup), holdTimer(50, false) {}
+  ButtonController(EventQueue &eventQueue, uint8_t pin = D2, bool pullup = true)
+      : evQ(eventQueue), btn(pin, pullup), holdTimer(50, false) {}
 
   void tick()
   {
@@ -17,11 +17,13 @@ public:
     switch (c)
     {
     case 1:
-      // queue message
+      evQ.post(Event::evInt16(EventType::BUTTON_CLICK, 1));
       break;
     case 2:
+      evQ.post(Event::evInt16(EventType::BUTTON_CLICK, 2));
       break;
     case 3:
+      evQ.post(Event::evInt16(EventType::BUTTON_CLICK, 3));
       break;
     }
 
@@ -29,6 +31,7 @@ public:
     {
       if (holdTimer.isReady())
       {
+        evQ.post(Event::evInt16(EventType::BUTTON_HOLD, brDirection ? 5 : -5));
       }
       brDirChanged = false;
     }
@@ -46,6 +49,7 @@ public:
 private:
   bool brDirection = true;
   bool brDirChanged = true;
+  EventQueue &evQ;
   Button btn;
   StepTimer holdTimer;
 };

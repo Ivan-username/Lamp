@@ -7,8 +7,8 @@
 class LampCore
 {
 public:
-  LampCore(EventQueue &eventQueue)
-      : evQ(eventQueue) {}
+  LampCore(EventQueue &eventQueue, EffectsController &effectsController)
+      : evQ(eventQueue), effCtrl(effectsController) {}
 
   void init()
   {
@@ -27,11 +27,20 @@ public:
     switch (e.type)
     {
     case EventType::INIT:
-      // handle initialization
+      effCtrl.applyEffect();
       break;
 
-    case EventType::WIFI_SWITCH_TO_AP:
-      // handle switching to AP mode
+    case EventType::BUTTON_CLICK:
+      if (e.int16Param == 1)
+        effCtrl.switchPower();
+      else if (e.int16Param == 2)
+        effCtrl.setNextEffect();
+      else if (e.int16Param == 3)
+        effCtrl.setPrevEffect();
+      break;
+
+    case EventType::BUTTON_HOLD:
+      effCtrl.changeBrightness(e.int16Param);
       break;
 
     default:
@@ -41,4 +50,5 @@ public:
 
 private:
   EventQueue &evQ;
+  EffectsController &effCtrl;
 };

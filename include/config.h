@@ -25,9 +25,9 @@
 #define LED_COL_ORDER GRB
 
 #define WIDTH 16
-#define HEIGHT 8
+#define HEIGHT 16
 #define LED_AMOUNT (WIDTH * HEIGHT)
-#define MATRIX_TYPE 2 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
+#define MATRIX_TYPE 1 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
 
 // Button configuration
 #define USE_BTN 1

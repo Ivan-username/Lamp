@@ -11,6 +11,7 @@ enum class EventType : uint8_t
   // Button
   BUTTON_CLICK,
   BUTTON_HOLD,
+  BUTTON_HOLD_END,
 
   // Effects
   EFFECT_CHANGE,

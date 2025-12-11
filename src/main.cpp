@@ -17,9 +17,9 @@ CRGB leds[LED_AMOUNT];
 EventQueue eventQueue;
 
 Effect *effects[EFFECTS_AMOUNT];
-EffectsController effectsManager(EFFECTS_AMOUNT, effects);
+EffectsController effectsController(EFFECTS_AMOUNT, effects);
 
-ButtonController lampBtn(BTN_PIN, false);
+ButtonController lampBtn(eventQueue, BTN_PIN, false);
 
 WiFiController lampWiFi(
     0, // 0 - STA, 1 - AP
@@ -45,7 +45,7 @@ SnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
 RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
-LampCore core(eventQueue);
+LampCore core(eventQueue, effectsController);
 
 void setup()
 {
@@ -76,12 +76,20 @@ void setup()
 
   lampWiFi.initWiFi();
   lampHttpServer.initHttpServer();
+
+  core.init();
 }
 
 void loop()
 {
 
-  effectsManager.tick();
+  effectsController.tick();
+
+  lampBtn.tick();
+
+  // lampWiFi.tick();
+
+  core.tick();
 
   lampHttpServer.tick();
   yield();
