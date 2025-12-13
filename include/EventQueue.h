@@ -6,8 +6,6 @@ enum class EventType : uint8_t
 {
   NONE = 0,
 
-  INIT,
-
   // Button
   BUTTON_CLICK,
   BUTTON_HOLD,

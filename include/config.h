@@ -13,8 +13,12 @@
 #define LOAD_SERV_ANIMATION 1000
 #define INFO_SERV_ANIMATION 300
 
-// Server configuration
-#define SERVER_PORT 80
+// Servers configuration
+#define HTTP_PORT 80
+#define WS_PORT 81
+
+// Core configuration
+#define CORE_MESSAGES_PER_TICK 8
 
 // Effect configuration
 #define EFFECTS_AMOUNT 2

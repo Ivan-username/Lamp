@@ -50,20 +50,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.onmessage = function (event) {
         statusBar.style.backgroundColor = "green";
-        console.log("event:" + event.data);
-        if (event.data.startsWith("ip:")) {
-            ip.textContent = event.data.substring(3);
-        } else if (event.data.startsWith("brightness:")) {
-            brightnessSlider.value = event.data.substring(11);
-        } else if (event.data.startsWith("scale:")) {
-            scaleSlider.value = event.data.substring(6);
-        } else if (event.data.startsWith("speed:")) {
-            speedSlider.value = event.data.substring(6);
-        } else if (event.data.startsWith("savedSTA:")) {
-            const [ssid, pass] = event.data.substring(9).split(",");
-            staName.placeholder = ssid;
-            staPassword.placeholder = pass;
-        }
+        console.log("event:", event.data);
+
+        let commands = event.data.split("|");
+
+        commands.forEach((element) => {
+            if (element.startsWith("IP:")) {
+                ip.textContent = element.substring(3);
+            } else if (element.startsWith("BRIGHT:")) {
+                brightnessSlider.value = element.substring(7);
+            } else if (element.startsWith("SCALE:")) {
+                scaleSlider.value = element.substring(6);
+            } else if (element.startsWith("SPEED:")) {
+                speedSlider.value = element.substring(6);
+            } else if (element.startsWith("SAVED_STA:")) {
+                const data = element.substring(10);
+                const [ssid, pass] = data.split(",");
+                staName.placeholder = ssid || "";
+                staPassword.placeholder = pass || "";
+            }
+        });
     };
 
     //elems events
@@ -72,8 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     onoffBtn.onclick = function () {
-        socket.send("switch");
-        console.log("switch");
+        socket.send("POWER");
+        console.log("POWER");
     };
 
     effects.onclick = function (event) {
@@ -81,8 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const effectIndex = Array.from(effects.children).indexOf(
                 event.target
             );
-            socket.send("effect:" + effectIndex);
-            console.log("effect:" + effectIndex);
+            socket.send("EFFECT:" + effectIndex);
+            console.log("EFFECT:" + effectIndex);
         }
     };
 
@@ -107,9 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // sliders
-    setupSlider(brightnessSlider, "brightness");
-    setupSlider(scaleSlider, "scale");
-    setupSlider(speedSlider, "speed");
+    setupSlider(brightnessSlider, "BRIGHT");
+    setupSlider(scaleSlider, "SCALE");
+    setupSlider(speedSlider, "SPEED");
 
     function sendSliderValue(command, value) {
         socket.send(command + ":" + value);
@@ -122,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
             throttle(function () {
                 const value = slider.value;
                 sendSliderValue(command, value);
-            }, 10)
+            }, 50)
         );
     }
 

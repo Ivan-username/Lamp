@@ -7,25 +7,12 @@
 class Effect
 {
 public:
-  struct EffectData
-  {
-    uint8_t brightness = 30;
-    uint8_t speed = 30;
-    uint8_t scale = 30;
-  } data;
-
   Effect(LedConfiguration &ledConf) : ledConfig(ledConf) {}
   virtual ~Effect() = default;
 
-  virtual void setBrightness(uint8_t b) { data.brightness = b; }
+  virtual void routine(uint8_t scale) { runTestDot(); };
 
-  virtual void setSpeed(uint8_t s) { data.speed = s; }
-
-  virtual void setScale(uint8_t sc) { data.scale = sc; }
-
-  virtual void routine() { runTestDot(); };
-
-  // virtual void reset() = 0;
+  virtual void reset() { resetDot(); };
 
 protected:
   LedConfiguration &ledConfig;
@@ -40,6 +27,8 @@ protected:
       testX = 0;
   }
 
+  void resetDot() { testX = 0; }
+
   uint16_t testX = 0;
 };
 
@@ -49,13 +38,11 @@ class RainbowEffect : public Effect
 public:
   RainbowEffect(LedConfiguration &ledConf) : Effect(ledConf) {}
 
-  void routine() override
+  void routine(uint8_t scale) override
   {
-
-    static uint8_t hue = 0;
     for (int y = 0; y < ledConfig.getHeight(); y++)
     {
-      CHSV thisColor = CHSV((byte)(hue + y * data.scale), 255, 255);
+      CHSV thisColor = CHSV((byte)(hue + y * scale), 255, 255);
       for (int x = 0; x < ledConfig.getWidth(); x++)
       {
         ledConfig.setPixColorXY(x, y, thisColor);
@@ -63,4 +50,12 @@ public:
     }
     hue++;
   }
+
+  void reset() override
+  {
+    hue = 0;
+  }
+
+private:
+  uint8_t hue = 0;
 };

@@ -11,17 +11,15 @@
 #include "Button.h"
 #include "ButtonController.h"
 #include "LedConfiguration.h"
+#include "LampState.h"
 
 CRGB leds[LED_AMOUNT];
 
 EventQueue eventQueue;
 
-Effect *effects[EFFECTS_AMOUNT];
-EffectsController effectsController(EFFECTS_AMOUNT, effects);
-
 ButtonController lampBtn(eventQueue, BTN_PIN, false);
 
-WiFiController lampWiFi(
+WiFiController WiFiCtrl(
     0, // 0 - STA, 1 - AP
     // ========== STA mode settings ==========
     "keenuka",
@@ -34,8 +32,8 @@ WiFiController lampWiFi(
     "31415926",
     eventQueue);
 
-HttpController lampHttpServer(80);
-WebSocketController lampWebSocket(81);
+HttpController httpCtrl(HTTP_PORT);
+WebSocketController webSocketCtrl(eventQueue, WS_PORT);
 
 #if MATRIX_TYPE == 2
 DoublePanelSnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
@@ -45,12 +43,25 @@ SnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
 RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
-LampCore core(eventQueue, effectsController);
+Effect *effects[EFFECTS_AMOUNT];
+Effect testDotEff(ledConfig);
+RainbowEffect rainbowEff(ledConfig);
+
+EffectsController effectsCtrl(effects);
+
+LampCore core(eventQueue, effectsCtrl, webSocketCtrl);
 
 void setup()
 {
-  effects[0] = new Effect(ledConfig);        // Red
-  effects[1] = new RainbowEffect(ledConfig); // Rainbow Vertical
+
+  Serial.println();
+  Serial.println(F("===== BOOT INFO ====="));
+  Serial.println(ESP.getResetInfo());
+  Serial.printf("Free heap: %u\n", ESP.getFreeHeap());
+  Serial.println(F("====================="));
+
+  effects[0] = &testDotEff; // Red
+  effects[1] = &rainbowEff; // Rainbow Vertical
 
   Serial.begin(115200);
   delay(2000);
@@ -74,8 +85,11 @@ void setup()
   Serial.println((uint32_t)leds, HEX);
   Serial.println((uint32_t)ledConfig._leds, HEX);
 
-  lampWiFi.initWiFi();
-  lampHttpServer.initHttpServer();
+  WiFiCtrl.init();
+  httpCtrl.init();
+  webSocketCtrl.init();
+
+  effectsCtrl.init();
 
   core.init();
 }
@@ -83,14 +97,21 @@ void setup()
 void loop()
 {
 
-  effectsController.tick();
-
-  lampBtn.tick();
-
-  // lampWiFi.tick();
-
-  core.tick();
-
-  lampHttpServer.tick();
+  WiFiCtrl.tick();
   yield();
+
+  httpCtrl.tick();
+  webSocketCtrl.tick();
+  yield();
+
+#if USE_BTN == 1
+  lampBtn.tick();
+#endif
+
+  effectsCtrl.tick();
+
+  for (uint8_t i = 0; i < CORE_MESSAGES_PER_TICK; i++)
+  {
+    core.tick();
+  }
 }

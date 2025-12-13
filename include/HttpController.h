@@ -10,7 +10,7 @@ public:
     {
     }
 
-    void initHttpServer()
+    void init()
     {
         _server.on("/", [this]()
                    { handleIndex(); });

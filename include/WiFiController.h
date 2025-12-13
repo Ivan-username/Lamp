@@ -62,7 +62,7 @@ public:
         }
     }
 
-    void initWiFi()
+    void init()
     {
         if (_wifiMode)
             setAPMode();
@@ -107,7 +107,7 @@ private:
     IPAddress _local_ip;
     IPAddress _gateway;
     IPAddress _subnet;
-    String _APssid = "LampAP";
+    String _APssid = "Lamp";
     String _APpassword = "31415926";
     EventQueue &evQ;
 

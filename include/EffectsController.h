@@ -2,113 +2,48 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
-#include "StepTimer.h"
+#include "Timer.h"
 #include "Effect.h"
+#include "LampState.h"
 
 class EffectsController
 {
 public:
-    EffectsController(uint8_t amount, Effect **effects)
-        : _amount(amount), _effects(effects), speedTimer(50, true) {}
+    EffectsController(Effect **effects)
+        : effs(effects)
+    {
+    }
 
     void tick()
     {
-        if (speedTimer.isReady() && _power)
+        if (timer.isReady() && lampState.power)
         {
-            if (_amount == 0)
-                return;
-            _effects[_current]->routine();
+            effs[lampState.effIndex]->routine(map(effSets[lampState.effIndex].scale, 0, 255, 1, 50));
             FastLED.show();
-            speedTimer.restart();
+            isClear = false;
+        }
+        if (!isClear && !lampState.power)
+        {
+            FastLED.clear(true);
+            isClear = true;
         }
     }
 
-    // ============ Power Control ============
-    void switchPower()
+    void init()
     {
-        _power = !_power;
-        if (!_power)
-            FastLED.clear(true);
-        else
-            applyEffect();
-    }
-    bool getPower() const { return _power; }
-
-    // ============ Effect Control ============
-    void applyEffect()
-    {
-        FastLED.clear(true);
-        setBrightness(_effects[_current]->data.brightness);
-        updateSpeedTimer(_effects[_current]->data.speed);
-    }
-    void applyEffect(uint8_t index)
-    {
-        if (index >= _amount)
-            return;
-        _current = index;
-        FastLED.clear(true);
-
-        setBrightness(_effects[index]->data.brightness);
-        updateSpeedTimer(_effects[index]->data.speed);
+        timer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
+        FastLED.setBrightness(map(effSets[lampState.effIndex].brightness, 0, 255, 1, 255));
     }
 
-    uint8_t getCurrentEffectIndex()
+    void update()
     {
-        return _current;
-    }
-
-    void setPrevEffect()
-    {
-        applyEffect((_current + _amount - 1) % _amount);
-    }
-    void setNextEffect()
-    {
-        applyEffect((_current + 1) % _amount);
-    }
-
-    // ============ Effect Parameters Control ============
-    void setBrightness(uint8_t b)
-    {
-        _effects[_current]->setBrightness(b);
-        FastLED.setBrightness(b);
-    }
-    void changeBrightness(int8_t delta)
-    {
-        uint8_t newBr = constrain(
-            (int16_t)_effects[_current]->data.brightness + delta,
-            1,
-            255);
-        setBrightness(newBr);
-    }
-
-    void setSpeed(uint8_t s)
-    {
-        _effects[_current]->setSpeed(s);
-        updateSpeedTimer(s);
-    }
-
-    void setScale(uint8_t sc) { _effects[_current]->setScale(sc); }
-
-    // ============ Get Current Effect Data ============
-    Effect::EffectData getCurrentEffectData()
-    {
-        return _effects[_current]->data;
+        timer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
+        FastLED.setBrightness(map(effSets[lampState.effIndex].brightness, 0, 255, 1, 255));
     }
 
 private:
-    // ============ Internal Helpers ============
+    bool isClear = false;
 
-    void updateSpeedTimer(uint32_t interval)
-    {
-        speedTimer.setInterval(interval);
-        speedTimer.force();
-    }
-
-    bool _power = false;
-
-    uint8_t _amount;
-    uint8_t _current = 0;
-
-    Effect **_effects;
-    StepTimer speedTimer;
+    Effect **effs;
+    Timer timer;
 };
