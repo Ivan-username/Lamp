@@ -2,116 +2,102 @@
 
 #include "config.h"
 #include "EventQueue.h"
-#include "StepTimer.h"
+#include "Timer.h"
+#include "LampState.h"
 
 #include <ESP8266WiFi.h>
 
 class WiFiController
 {
 public:
-    WiFiController(uint8_t wifiMode,
-                   String STAssid,
-                   String STApassword,
-                   IPAddress local_ip,
-                   IPAddress gateway,
-                   IPAddress subnet,
-                   String APssid,
-                   String APpassword,
-                   EventQueue &eventQueue)
-        : _wifiMode(wifiMode),
-          _STAssid(STAssid),
-          _STApassword(STApassword),
-          _local_ip(local_ip),
-          _gateway(gateway),
-          _subnet(subnet),
-          _APssid(APssid),
-          _APpassword(APpassword),
-          evQ(eventQueue)
+    WiFiController(EventQueue &eventQueue) : evQ(eventQueue)
     {
     }
 
     void tick()
     {
-        if (_wifiMode == 0)
-        {
-            if (getSTAstatus() == WL_CONNECTED && !_STAStatus)
-                evQ.post(Event::ev(EventType::WIFI_CONNECTED));
-            else
-            {
-                evQ.post(Event::ev(EventType::WIFI_DISCONNECTED));
-                _STAStatus = false;
-                _STAReconnectTimer.restart();
-            }
+        if (!checkTimer.isReady())
+            return;
 
-            if (!_STAStatus && _STAReconnectTimer.isReady())
+        if (lampState.wifiMode != LampWiFiMode::STA)
+            return;
+
+        wl_status_t status = WiFi.status();
+
+        if (status == WL_CONNECTED)
+        {
+            if (!connected)
             {
-                if (_STAreconnectTries > 0)
-                {
-                    _STAreconnectTries--;
-                    _STAReconnectTimer.reset();
-                }
-                else
-                {
-                    evQ.post(Event::ev(EventType::WIFI_SWITCH_TO_AP));
-                    _STAStatus = true; // to prevent multiple events
-                    _STAreconnectTries = 10;
-                    _wifiMode = 1;
-                    _STAReconnectTimer.stop();
-                }
+                connected = true;
+                evQ.post(Event::ev(EventType::WIFI_CONNECTED));
             }
+            return;
         }
+
+        // ---- NOT CONNECTED ----
+
+        if (connected)
+        {
+            connected = false;
+            evQ.post(Event::ev(EventType::WIFI_DISCONNECTED));
+            return;
+        }
+
+        // ---- STILL TRYING ----
+
+        if (tries > 0)
+        {
+            tries--;
+            return;
+        }
+
+        // ---- FAIL → SWITCH TO AP ----
+
+        tries = MAX_TRIES;
+        lampState.wifiMode = LampWiFiMode::AP;
+        evQ.post(Event::ev(EventType::WIFI_UPDATE));
     }
 
     void init()
     {
-        if (_wifiMode)
-            setAPMode();
+        setWiFiMode(lampState.wifiMode);
+    }
+
+    void setWiFiMode(LampWiFiMode mode)
+    {
+
+        // 2. disconnect STA
+        WiFi.disconnect(true);
+        delay(50);
+
+        // 3. WiFi OFF
+        WiFi.mode(WIFI_OFF);
+        delay(100);
+
+        if (lampState.wifiMode == LampWiFiMode::STA)
+        {
+            WiFi.mode(WIFI_STA);
+            delay(50);
+            WiFi.begin(lampState.ssidSTA, lampState.passSTA);
+        }
         else
-            setSTAMode();
-    }
-
-    void setAPMode()
-    {
-        WiFi.mode(WIFI_AP);
-        WiFi.softAP(_APssid, _APpassword);
-        WiFi.softAPConfig(_local_ip, _gateway, _subnet);
-        // queue message
-    }
-
-    void setSTAMode()
-    {
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(_STAssid, _STApassword);
-        // queue message
-    }
-
-    wl_status_t getSTAstatus()
-    {
-        return WiFi.status();
-    }
-
-    IPAddress getSTALocalIP()
-    {
-        return WiFi.localIP();
-    }
-
-    IPAddress getAPLocalIP()
-    {
-        return WiFi.softAPIP();
+        {
+            WiFi.mode(WIFI_AP);
+            delay(50);
+            WiFi.softAP(lampState.ssidAP, lampState.passAP);
+            WiFi.softAPConfig(
+                lampState.localIPAP,
+                lampState.gatewayAP,
+                lampState.subnetAP);
+        }
     }
 
 private:
-    uint8_t _wifiMode;
-    String _STAssid;
-    String _STApassword;
-    IPAddress _local_ip;
-    IPAddress _gateway;
-    IPAddress _subnet;
-    String _APssid = "Lamp";
-    String _APpassword = "31415926";
-    EventQueue &evQ;
+    static constexpr uint8_t MAX_TRIES = 10;
+    static constexpr uint32_t CHECK_INTERVAL_MS = 1000;
 
-    StepTimer _STAReconnectTimer = StepTimer(1000, true);
-    bool _STAStatus = false;
-    uint8_t _STAreconnectTries = 10;
+    EventQueue &evQ;
+    Timer checkTimer{CHECK_INTERVAL_MS};
+    bool connected = false;
+    uint8_t tries = MAX_TRIES;
 };

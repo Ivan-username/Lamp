@@ -12,40 +12,12 @@ public:
 
     void init()
     {
-        _server.on("/", [this]()
-                   { handleIndex(); });
-        _server.on("/index.html", [this]()
-                   { handleIndex(); });
-
-        _server.on("/style.css", [this]()
-                   { handlePageComponents(); });
-        _server.on("/script.js", [this]()
-                   { handlePageComponents(); });
-
-        _server.on("/icons/ip.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/reload.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/brightness.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/scale.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/speed.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/onoff.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/options.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/sta.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/ap.svg", [this]()
-                   { handlePageComponents(); });
-        _server.on("/icons/reboot.svg", [this]()
-                   { handlePageComponents(); });
-
+        setupRoutes();
         _server.begin();
-
-        // queue message
+    }
+    void drop()
+    {
+        _server.close();
     }
 
     void tick()
@@ -54,7 +26,28 @@ public:
     }
 
 private:
-    void handlePageComponents()
+    void setupRoutes()
+    {
+        _server.on("/", [this]()
+                   { handleIndex(); });
+        _server.on("/index.html", [this]()
+                   { handleIndex(); });
+
+        const char *files[] = {
+            "/style.css", "/script.js",
+            "/icons/ip.svg", "/icons/reload.svg",
+            "/icons/brightness.svg", "/icons/scale.svg",
+            "/icons/speed.svg", "/icons/onoff.svg",
+            "/icons/options.svg", "/icons/sta.svg",
+            "/icons/ap.svg", "/icons/reboot.svg"};
+
+        for (const char *f : files)
+            _server.on(f, [this]()
+                       { handlePageComponents(); });
+    }
+
+    void
+    handlePageComponents()
     {
         String path = _server.uri();
 

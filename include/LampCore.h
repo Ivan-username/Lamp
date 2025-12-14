@@ -2,6 +2,8 @@
 #pragma once
 #include "EffectsController.h"
 #include "WebSocketController.h"
+#include "HttpController.h"
+#include "WiFiController.h"
 #include "EventQueue.h"
 #include "LampState.h"
 #include "config.h"
@@ -11,10 +13,14 @@ class LampCore
 public:
   LampCore(EventQueue &eventQueue,
            EffectsController &effectsController,
-           WebSocketController &webSocketController)
+           WebSocketController &webSocketController,
+           HttpController &httpController,
+           WiFiController &wiFiController)
       : evQ(eventQueue),
         effCtrl(effectsController),
-        wsCtrl(webSocketController) {}
+        wsCtrl(webSocketController),
+        httpCtrl(httpController),
+        wifiCtrl(wiFiController) {}
 
   void init() {}
 
@@ -55,6 +61,38 @@ public:
         effSets[lampState.effIndex].scale = e.stringParam.substring(6).toInt();
       else if (e.stringParam.startsWith("SPEED:"))
         effSets[lampState.effIndex].speed = e.stringParam.substring(6).toInt();
+      else if (e.stringParam.startsWith("STA:"))
+      {
+        if (lampState.wifiMode == LampWiFiMode::STA)
+          return;
+
+        String payload = e.stringParam.substring(4);
+        int8_t commaIndex = payload.indexOf(',');
+
+        if (commaIndex == -1)
+          return;
+
+        lampState.ssidSTA = payload.substring(0, commaIndex);
+        lampState.passSTA = payload.substring(commaIndex + 1);
+        lampState.wifiMode = LampWiFiMode::STA;
+        evQ.post(Event::ev(EventType::WIFI_UPDATE));
+      }
+      else if (e.stringParam.startsWith("AP"))
+      {
+        if (lampState.wifiMode == LampWiFiMode::AP)
+          return;
+
+        lampState.wifiMode = LampWiFiMode::AP;
+        evQ.post(Event::ev(EventType::WIFI_UPDATE));
+      }
+      break;
+
+    case EventType::WIFI_UPDATE:
+      wsCtrl.drop();
+      httpCtrl.drop();
+      wifiCtrl.setWiFiMode(lampState.wifiMode);
+      httpCtrl.init();
+      wsCtrl.init();
       break;
 
     case EventType::HTTP_REQUEST:
@@ -72,4 +110,6 @@ private:
   EventQueue &evQ;
   EffectsController &effCtrl;
   WebSocketController &wsCtrl;
+  HttpController &httpCtrl;
+  WiFiController &wifiCtrl;
 };

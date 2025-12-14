@@ -17,6 +17,7 @@ public:
   }
 
   void init() { ws.begin(); }
+  void drop() { ws.close(); }
 
   void tick() { ws.loop(); }
 
@@ -91,7 +92,7 @@ private:
   }
   virtual void onConnect(uint8_t clientId, IPAddress ip)
   {
-    // queue message
+    update();
   }
 
   virtual void onDisconnect(uint8_t clientId)

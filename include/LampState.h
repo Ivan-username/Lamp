@@ -5,44 +5,26 @@
 
 #pragma once
 
-constexpr uint8_t SSID_MAX_LEN = 32;
-constexpr uint8_t PASS_MAX_LEN = 64;
+enum class LampWiFiMode : uint8_t
+{
+  STA = 0,
+  AP = 1
+};
 
 struct LampState
 {
 public:
   /* ==================== API ==================== */
 
-  inline void safeCopy(char *dst, size_t dstSize, const char *src)
+  void setSTASSID(String ssid)
   {
-    if (!dst || dstSize == 0)
-      return;
-
-    if (!src)
-    {
-      dst[0] = '\0';
-      return;
-    }
-
-    strncpy(dst, src, dstSize - 1);
-    dst[dstSize - 1] = '\0';
-  }
-
-  void setSSID(const char *ssid)
-  {
-    if (wifiMode)
-      safeCopy(ssidSTA, sizeof(ssidSTA), ssid);
-    else
-      safeCopy(ssidAP, sizeof(ssidAP), ssid);
+    ssidSTA = ssid;
     changed = true;
   }
 
-  void setPassword(const char *pass)
+  void setSTAPass(String pass)
   {
-    if (wifiMode)
-      safeCopy(passSTA, sizeof(passSTA), pass);
-    else
-      safeCopy(passAP, sizeof(passAP), pass);
+    passSTA = pass;
     changed = true;
   }
 
@@ -56,10 +38,10 @@ public:
     result += power ? F("ON") : F("OFF");
 
     result += F(", wifi=");
-    result += wifi ? F("CONNECTED") : F("DISCONNECTED");
+    result += sta ? F("CONNECTED") : F("DISCONNECTED");
 
     result += F(", wifiMode=");
-    result += wifiMode ? F("AP") : F("STA");
+    result += result += (wifiMode == LampWiFiMode::AP) ? F("AP") : F("STA");
 
     result += F(", effect=");
     result += effIndex;
@@ -75,14 +57,18 @@ public:
   /* ==================== DATA ==================== */
 
   bool changed;
-  bool wifi;
-  uint8_t wifiMode;
+  bool sta;
+  LampWiFiMode wifiMode;
 
-  char ssidSTA[SSID_MAX_LEN + 1];
-  char passSTA[PASS_MAX_LEN + 1];
+  String ssidSTA;
+  String passSTA;
+  IPAddress localIPSTA;
 
-  char ssidAP[SSID_MAX_LEN + 1];
-  char passAP[PASS_MAX_LEN + 1];
+  String ssidAP;
+  String passAP;
+  IPAddress localIPAP;
+  IPAddress gatewayAP;
+  IPAddress subnetAP;
 
   bool power;
   uint8_t effAmount;
@@ -92,16 +78,20 @@ public:
 
   LampState()
       : changed(true),
-        wifi(true),
-        wifiMode(0),
+        sta(false),
+        wifiMode(LampWiFiMode::STA),
+        ssidSTA("keenuka"),
+        passSTA("ZreTHEA44"),
+        localIPSTA(1, 1, 1, 1),
+        ssidAP("JLamp"),
+        passAP("12345678"),
+        localIPAP(192, 168, 4, 1),
+        gatewayAP(192, 168, 4, 1),
+        subnetAP(255, 255, 255, 0),
         power(false),
         effAmount(EFFECTS_AMOUNT),
         effIndex(0)
   {
-    ssidSTA[0] = '\0';
-    passSTA[0] = '\0';
-    ssidAP[0] = '\0';
-    passAP[0] = '\0';
   }
 };
 

@@ -21,7 +21,7 @@ enum class EventType : uint8_t
   // WiFi
   WIFI_CONNECTED,
   WIFI_DISCONNECTED,
-  WIFI_SWITCH_TO_AP,
+  WIFI_UPDATE,
 
   // WebSocket / HTTP
   WS_MESSAGE,

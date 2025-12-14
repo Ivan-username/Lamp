@@ -95,20 +95,20 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSTABtn.onclick = function () {
         const ssid = staName.value;
         const password = staPassword.value;
-        socket.send("sta:" + ssid + "," + password);
-        console.log("sta:" + ssid + "," + password);
+        socket.send("STA:" + ssid + "," + password);
+        console.log("STA:" + ssid + "," + password);
         statusBar.style.backgroundColor = "red";
     };
 
     setupAPBtn.onclick = function () {
-        socket.send("ap");
-        console.log("ap");
+        socket.send("AP");
+        console.log("AP");
         statusBar.style.backgroundColor = "red";
     };
 
     rebootBtn.onclick = function () {
-        socket.send("reboot");
-        console.log("reboot");
+        socket.send("REBOOT");
+        console.log("REBOOT");
         statusBar.style.backgroundColor = "red";
     };
 

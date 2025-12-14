@@ -13,7 +13,7 @@ public:
 
   void setInterval(uint32_t interval)
   {
-    _interval = (interval < 10) ? 10 : interval;
+    _interval = (interval < MIN_INTERVAL) ? MIN_INTERVAL : interval;
   }
 
   bool isReady()
@@ -35,4 +35,6 @@ public:
 private:
   uint32_t _timer = 0;
   uint32_t _interval = 1;
+
+  uint8_t MIN_INTERVAL = 10;
 };

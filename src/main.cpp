@@ -19,18 +19,7 @@ EventQueue eventQueue;
 
 ButtonController lampBtn(eventQueue, BTN_PIN, false);
 
-WiFiController WiFiCtrl(
-    0, // 0 - STA, 1 - AP
-    // ========== STA mode settings ==========
-    "keenuka",
-    "ZreTHEA44",
-    // ========== AP mode settings ==========
-    IPAddress(192, 168, 4, 1),
-    IPAddress(192, 168, 4, 1),
-    IPAddress(255, 255, 255, 0),
-    "Lamp",
-    "31415926",
-    eventQueue);
+WiFiController wifiCtrl(eventQueue);
 
 HttpController httpCtrl(HTTP_PORT);
 WebSocketController webSocketCtrl(eventQueue, WS_PORT);
@@ -49,7 +38,7 @@ RainbowEffect rainbowEff(ledConfig);
 
 EffectsController effectsCtrl(effects);
 
-LampCore core(eventQueue, effectsCtrl, webSocketCtrl);
+LampCore core(eventQueue, effectsCtrl, webSocketCtrl, httpCtrl, wifiCtrl);
 
 void setup()
 {
@@ -85,7 +74,7 @@ void setup()
   Serial.println((uint32_t)leds, HEX);
   Serial.println((uint32_t)ledConfig._leds, HEX);
 
-  WiFiCtrl.init();
+  wifiCtrl.init();
   httpCtrl.init();
   webSocketCtrl.init();
 
@@ -97,7 +86,7 @@ void setup()
 void loop()
 {
 
-  WiFiCtrl.tick();
+  wifiCtrl.tick();
   yield();
 
   httpCtrl.tick();
