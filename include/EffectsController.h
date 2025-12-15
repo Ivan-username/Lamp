@@ -9,7 +9,7 @@
 class EffectsController
 {
 public:
-    EffectsController(Effect **effects)
+    EffectsController(Effect *effects[])
         : effs(effects)
     {
     }
@@ -26,6 +26,7 @@ public:
         {
             FastLED.clear(true);
             isClear = true;
+            effs[lampState.effIndex]->reset();
         }
     }
 
@@ -33,12 +34,14 @@ public:
     {
         timer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
         FastLED.setBrightness(map(effSets[lampState.effIndex].brightness, 0, 255, 1, 255));
+        effs[lampState.effIndex]->reset();
     }
 
     void update()
     {
         timer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
         FastLED.setBrightness(map(effSets[lampState.effIndex].brightness, 0, 255, 1, 255));
+        effs[lampState.effIndex]->reset();
     }
 
 private:

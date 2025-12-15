@@ -27,7 +27,7 @@ public:
     message.reserve(140);
 
     message += F("IP:");
-    message += F("1.1.1.1");
+    message += lampState.localIPSTA.toString();
     message += F("|");
 
     message += F("BRIGHT:");

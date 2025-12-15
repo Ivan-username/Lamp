@@ -33,8 +33,10 @@ RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
 Effect *effects[EFFECTS_AMOUNT];
-Effect testDotEff(ledConfig);
-RainbowEffect rainbowEff(ledConfig);
+JustLampEffect justLampEff(ledConfig);
+RainbowHorizontalEffect rainbowHorzEff(ledConfig);
+RainbowVerticalEffect rainbowVertEff(ledConfig);
+SnowfallEffect snowfallEffect(ledConfig);
 
 EffectsController effectsCtrl(effects);
 
@@ -49,8 +51,10 @@ void setup()
   Serial.printf("Free heap: %u\n", ESP.getFreeHeap());
   Serial.println(F("====================="));
 
-  effects[0] = &testDotEff; // Red
-  effects[1] = &rainbowEff; // Rainbow Vertical
+  effects[0] = &justLampEff;
+  effects[1] = &rainbowHorzEff;
+  effects[2] = &rainbowVertEff;
+  effects[3] = &snowfallEffect;
 
   Serial.begin(115200);
   delay(2000);

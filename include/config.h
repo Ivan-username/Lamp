@@ -21,7 +21,7 @@
 #define CORE_MESSAGES_PER_TICK 8
 
 // Effect configuration
-#define EFFECTS_AMOUNT 2
+#define EFFECTS_AMOUNT 4
 
 // LED configuration
 #define LED_TYPE WS2812
