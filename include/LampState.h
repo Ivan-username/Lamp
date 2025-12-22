@@ -38,7 +38,7 @@ public:
     result += power ? F("ON") : F("OFF");
 
     result += F(", wifi=");
-    result += sta ? F("CONNECTED") : F("DISCONNECTED");
+    result += connected ? F("CONNECTED") : F("DISCONNECTED");
 
     result += F(", wifiMode=");
     result += result += (wifiMode == LampWiFiMode::AP) ? F("AP") : F("STA");
@@ -57,7 +57,7 @@ public:
   /* ==================== DATA ==================== */
 
   bool changed;
-  bool sta;
+  bool connected;
   LampWiFiMode wifiMode;
 
   String ssidSTA;
@@ -78,10 +78,10 @@ public:
 
   LampState()
       : changed(true),
-        sta(false),
+        connected(false),
         wifiMode(LampWiFiMode::STA),
-        ssidSTA("keenuka"),
-        passSTA("ZreTHEA44"),
+        ssidSTA("keenetic"),
+        passSTA("12345678"),
         localIPSTA(1, 1, 1, 1),
         ssidAP("JLamp"),
         passAP("12345678"),

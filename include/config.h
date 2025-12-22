@@ -21,7 +21,7 @@
 #define CORE_MESSAGES_PER_TICK 8
 
 // Effect configuration
-#define EFFECTS_AMOUNT 4
+#define EFFECTS_AMOUNT 5
 
 // LED configuration
 #define LED_TYPE WS2812
@@ -29,12 +29,12 @@
 #define LED_COL_ORDER GRB
 
 #define WIDTH 16
-#define HEIGHT 16
+#define HEIGHT 8
 #define LED_AMOUNT (WIDTH * HEIGHT)
-#define MATRIX_TYPE 1 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
+#define MATRIX_TYPE 2 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
 
 // Button configuration
-#define USE_BTN 1
+#define USE_BTN 0
 #define BTN_PIN D2
 
 // Debugging

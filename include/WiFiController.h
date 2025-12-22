@@ -26,9 +26,10 @@ public:
 
         if (status == WL_CONNECTED)
         {
-            if (!connected)
+            if (!lampState.connected)
             {
-                connected = true;
+                lampState.connected = true;
+                lampState.localIPSTA = WiFi.localIP();
                 evQ.post(Event::ev(EventType::WIFI_CONNECTED));
             }
             return;
@@ -36,9 +37,9 @@ public:
 
         // ---- NOT CONNECTED ----
 
-        if (connected)
+        if (lampState.connected)
         {
-            connected = false;
+            lampState.connected = false;
             evQ.post(Event::ev(EventType::WIFI_DISCONNECTED));
             return;
         }
@@ -98,6 +99,5 @@ private:
 
     EventQueue &evQ;
     Timer checkTimer{CHECK_INTERVAL_MS};
-    bool connected = false;
     uint8_t tries = MAX_TRIES;
 };

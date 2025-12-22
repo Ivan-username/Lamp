@@ -27,7 +27,7 @@ public:
     message.reserve(140);
 
     message += F("IP:");
-    message += lampState.localIPSTA.toString();
+    message += lampState.wifiMode == LampWiFiMode::STA ? lampState.localIPSTA.toString() : lampState.localIPAP.toString();
     message += F("|");
 
     message += F("BRIGHT:");

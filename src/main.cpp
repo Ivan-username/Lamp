@@ -33,7 +33,10 @@ RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
 Effect *effects[EFFECTS_AMOUNT];
+Effect testDot(ledConfig);
 JustLampEffect justLampEff(ledConfig);
+// FireNoiseEffect fireNoiseEffect(ledConfig);
+GyverFireEffect gyverFireEff(ledConfig);
 RainbowHorizontalEffect rainbowHorzEff(ledConfig);
 RainbowVerticalEffect rainbowVertEff(ledConfig);
 SnowfallEffect snowfallEffect(ledConfig);
@@ -52,9 +55,10 @@ void setup()
   Serial.println(F("====================="));
 
   effects[0] = &justLampEff;
-  effects[1] = &rainbowHorzEff;
-  effects[2] = &rainbowVertEff;
-  effects[3] = &snowfallEffect;
+  effects[1] = &gyverFireEff;
+  effects[2] = &rainbowHorzEff;
+  effects[3] = &rainbowVertEff;
+  effects[4] = &snowfallEffect;
 
   Serial.begin(115200);
   delay(2000);
