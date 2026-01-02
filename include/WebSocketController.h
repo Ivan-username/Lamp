@@ -27,7 +27,14 @@ public:
     message.reserve(140);
 
     message += F("IP:");
-    message += lampState.wifiMode == LampWiFiMode::STA ? lampState.localIPSTA.toString() : lampState.localIPAP.toString();
+    message += lampState.wifiMode == LampWiFiMode::STA ? (String(lampState.localIPSTA[0]) + "." +
+                                                          String(lampState.localIPSTA[1]) + "." +
+                                                          String(lampState.localIPSTA[2]) + "." +
+                                                          String(lampState.localIPSTA[3]))
+                                                       : (String(lampState.localIPAP[0]) + "." +
+                                                          String(lampState.localIPAP[1]) + "." +
+                                                          String(lampState.localIPAP[2]) + "." +
+                                                          String(lampState.localIPAP[3]));
     message += F("|");
 
     message += F("BRIGHT:");
@@ -59,7 +66,6 @@ private:
   {
     switch (type)
     {
-      DEBUGLN(type);
     case WStype_DISCONNECTED:
       onDisconnect(clientId);
       break;
@@ -72,7 +78,6 @@ private:
     break;
 
     case WStype_TEXT:
-      Serial.println("WS TEXT");
       onMessage(clientId, payload, length);
       break;
 
@@ -102,9 +107,48 @@ private:
 
   virtual void onMessage(uint8_t clientId, uint8_t *payload, size_t length)
   {
-    evQ.post(Event::evStr(EventType::WS_MESSAGE,
-                          String((char *)payload).substring(0, length)));
-    Serial.println(String((char *)payload).substring(0, length));
+
+    String message = String((char *)payload).substring(0, length);
+
+    if (message.startsWith("POWER"))
+      evQ.post(Event::ev(EventType::POWER_CHANGE));
+    else if (message.startsWith("EFFECT:"))
+      evQ.post(Event::evInt16(EventType::EFF_CHANGE, constrain(message.substring(7).toInt(), 0, lampState.effAmount - 1)));
+    else if (message.startsWith("BRIGHT:"))
+      evQ.post(Event::evInt16(EventType::EFF_SET_BRIGHTNESS, constrain(message.substring(7).toInt(), 1, 255)));
+    else if (message.startsWith("SCALE:"))
+      evQ.post(Event::evInt16(EventType::EFF_SET_SCALE, constrain(message.substring(6).toInt(), 1, 255)));
+    else if (message.startsWith("SPEED:"))
+      evQ.post(Event::evInt16(EventType::EFF_SET_SPEED, constrain(message.substring(6).toInt(), 10, 255)));
+    else if (message.startsWith("STA:"))
+    {
+      if (lampState.wifiMode == LampWiFiMode::STA)
+        return;
+
+      String payload = message.substring(4);
+      int8_t commaIndex = payload.indexOf(',');
+
+      if (commaIndex == -1)
+        return;
+
+      payload.substring(0, commaIndex)
+          .toCharArray(lampState.ssidSTA, WIFI_SSID_LEN);
+
+      payload.substring(commaIndex + 1)
+          .toCharArray(lampState.passSTA, WIFI_PASS_LEN);
+      // lampState.ssidSTA.trim();
+      // lampState.passSTA.trim();
+      lampState.wifiMode = LampWiFiMode::STA;
+      evQ.post(Event::ev(EventType::WIFI_UPDATE));
+    }
+    else if (message.startsWith("AP"))
+    {
+      if (lampState.wifiMode == LampWiFiMode::AP)
+        return;
+
+      lampState.wifiMode = LampWiFiMode::AP;
+      evQ.post(Event::ev(EventType::WIFI_UPDATE));
+    }
   }
 
   virtual void onBinaryMessage(uint8_t clientId, uint8_t *payload, size_t length)

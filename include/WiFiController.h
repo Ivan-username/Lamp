@@ -29,7 +29,12 @@ public:
             if (!lampState.connected)
             {
                 lampState.connected = true;
-                lampState.localIPSTA = WiFi.localIP();
+                IPAddress ip = WiFi.localIP();
+                lampState.localIPSTA[0] = ip[0];
+                lampState.localIPSTA[1] = ip[1];
+                lampState.localIPSTA[2] = ip[2];
+                lampState.localIPSTA[3] = ip[3];
+
                 evQ.post(Event::ev(EventType::WIFI_CONNECTED));
             }
             return;

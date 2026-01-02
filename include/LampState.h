@@ -2,8 +2,13 @@
 
 #include "config.h"
 #include <Arduino.h>
+#include <FileData.h>
+#include <LittleFS.h>
 
 #pragma once
+
+constexpr size_t WIFI_SSID_LEN = 32;
+constexpr size_t WIFI_PASS_LEN = 64;
 
 enum class LampWiFiMode : uint8_t
 {
@@ -14,20 +19,6 @@ enum class LampWiFiMode : uint8_t
 struct LampState
 {
 public:
-  /* ==================== API ==================== */
-
-  void setSTASSID(String ssid)
-  {
-    ssidSTA = ssid;
-    changed = true;
-  }
-
-  void setSTAPass(String pass)
-  {
-    passSTA = pass;
-    changed = true;
-  }
-
   String toString() const
   {
     String result;
@@ -41,57 +32,96 @@ public:
     result += connected ? F("CONNECTED") : F("DISCONNECTED");
 
     result += F(", wifiMode=");
-    result += result += (wifiMode == LampWiFiMode::AP) ? F("AP") : F("STA");
+    if (wifiMode == LampWiFiMode::AP)
+    {
+      result += F("AP(");
+      result += String(ssidAP);
+      result += F(",");
+      result += String(passAP);
+    }
+    else
+    {
+      result += F("STA(");
+      result += String(ssidSTA);
+      result += F(",");
+      result += String(passSTA);
+    }
 
     result += F(", effect=");
     result += effIndex;
     result += '/';
     result += (effAmount > 0 ? effAmount - 1 : 0);
 
-    result += F(", changed=");
-    result += changed ? F("true") : F("false");
-
     return result;
   }
 
   /* ==================== DATA ==================== */
 
-  bool changed;
   bool connected;
+  bool power;
+
   LampWiFiMode wifiMode;
 
-  String ssidSTA;
-  String passSTA;
-  IPAddress localIPSTA;
+  char ssidSTA[WIFI_SSID_LEN];
+  char passSTA[WIFI_PASS_LEN];
+  uint8_t localIPSTA[4];
 
-  String ssidAP;
-  String passAP;
-  IPAddress localIPAP;
-  IPAddress gatewayAP;
-  IPAddress subnetAP;
+  char ssidAP[WIFI_SSID_LEN];
+  char passAP[WIFI_PASS_LEN];
+  uint8_t localIPAP[4];
+  uint8_t gatewayAP[4];
+  uint8_t subnetAP[4];
 
-  bool power;
   uint8_t effAmount;
   uint8_t effIndex;
 
+  /* ==================== API ==================== */
+  void setSTASSID(const char *ssid)
+  {
+    strncpy(ssidSTA, ssid, WIFI_SSID_LEN - 1);
+    ssidSTA[WIFI_SSID_LEN - 1] = '\0';
+  }
+
+  void setSTAPass(const char *pass)
+  {
+    strncpy(passSTA, pass, WIFI_PASS_LEN - 1);
+    passSTA[WIFI_PASS_LEN - 1] = '\0';
+  }
+
   /* ==================== CTOR ==================== */
 
+  /* ===== CTOR ===== */
   LampState()
-      : changed(true),
-        connected(false),
-        wifiMode(LampWiFiMode::STA),
-        ssidSTA("keenetic"),
-        passSTA("12345678"),
-        localIPSTA(1, 1, 1, 1),
-        ssidAP("JLamp"),
-        passAP("12345678"),
-        localIPAP(192, 168, 4, 1),
-        gatewayAP(192, 168, 4, 1),
-        subnetAP(255, 255, 255, 0),
-        power(false),
-        effAmount(EFFECTS_AMOUNT),
-        effIndex(0)
   {
+    connected = false;
+    power = false;
+
+    wifiMode = LampWiFiMode::STA;
+
+    strncpy(ssidSTA, "keenetic", WIFI_SSID_LEN);
+    strncpy(passSTA, "12345678", WIFI_PASS_LEN);
+    localIPSTA[0] = 1;
+    localIPSTA[1] = 1;
+    localIPSTA[2] = 1;
+    localIPSTA[3] = 1;
+
+    strncpy(ssidAP, "JLamp", WIFI_SSID_LEN);
+    strncpy(passAP, "12345678", WIFI_PASS_LEN);
+    localIPAP[0] = 192;
+    localIPAP[1] = 168;
+    localIPAP[2] = 4;
+    localIPAP[3] = 1;
+    gatewayAP[0] = 192;
+    gatewayAP[1] = 168;
+    gatewayAP[2] = 4;
+    gatewayAP[3] = 1;
+    subnetAP[0] = 255;
+    subnetAP[1] = 255;
+    subnetAP[2] = 255;
+    subnetAP[3] = 0;
+
+    effAmount = EFFECTS_AMOUNT;
+    effIndex = 0;
   }
 };
 
@@ -104,3 +134,19 @@ struct EffSets
 
 EffSets effSets[EFFECTS_AMOUNT];
 LampState lampState;
+
+FileData lampStateFD(
+    &LittleFS,
+    "/lamp_state.bin",
+    'L',
+    &lampState,
+    sizeof(lampState),
+    10000);
+
+FileData effSetsFD(
+    &LittleFS,
+    "/eff_sets.bin",
+    'S',
+    &effSets,
+    sizeof(effSets),
+    10000);

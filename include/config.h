@@ -34,15 +34,8 @@
 #define MATRIX_TYPE 2 // 0 - [rows], 1 - [snake], 2 - [(nхn)х2 snake]
 
 // Button configuration
-#define USE_BTN 0
+#define USE_BTN
 #define BTN_PIN D2
 
-// Debugging
-#define DEBUG_SERIAL_LAMP
-#ifdef DEBUG_SERIAL_LAMP
-#define DEBUGLN(x) Serial.println(x)
-#define DEBUG(x) Serial.print(x)
-#else
-#define DEBUGLN(x)
-#define DEBUG(x)
-#endif
+// EEPROM
+#define USE_EEPROM

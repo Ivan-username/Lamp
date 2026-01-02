@@ -8,6 +8,8 @@
 #include "LampState.h"
 #include "config.h"
 
+#include "DEBUG.h"
+
 class LampCore
 {
 public:
@@ -49,42 +51,24 @@ public:
       effSets[lampState.effIndex].brightness = constrain(effSets[lampState.effIndex].brightness + e.int16Param, 1, 255);
       break;
 
-      // ============ WS / HTTP Events ============
-    case EventType::WS_MESSAGE:
-      if (e.stringParam.startsWith("POWER"))
-        lampState.power = !lampState.power;
-      else if (e.stringParam.startsWith("EFFECT:"))
-        lampState.effIndex = constrain(e.stringParam.substring(7).toInt(), 0, lampState.effAmount - 1);
-      else if (e.stringParam.startsWith("BRIGHT:"))
-        effSets[lampState.effIndex].brightness = e.stringParam.substring(7).toInt();
-      else if (e.stringParam.startsWith("SCALE:"))
-        effSets[lampState.effIndex].scale = e.stringParam.substring(6).toInt();
-      else if (e.stringParam.startsWith("SPEED:"))
-        effSets[lampState.effIndex].speed = e.stringParam.substring(6).toInt();
-      else if (e.stringParam.startsWith("STA:"))
-      {
-        if (lampState.wifiMode == LampWiFiMode::STA)
-          return;
+    case EventType::POWER_CHANGE:
+      lampState.power = !lampState.power;
+      break;
 
-        String payload = e.stringParam.substring(4);
-        int8_t commaIndex = payload.indexOf(',');
+    case EventType::EFF_CHANGE:
+      lampState.effIndex = e.int16Param;
+      break;
 
-        if (commaIndex == -1)
-          return;
+    case EventType::EFF_SET_BRIGHTNESS:
+      effSets[lampState.effIndex].brightness = e.int16Param;
+      break;
 
-        lampState.ssidSTA = payload.substring(0, commaIndex);
-        lampState.passSTA = payload.substring(commaIndex + 1);
-        lampState.wifiMode = LampWiFiMode::STA;
-        evQ.post(Event::ev(EventType::WIFI_UPDATE));
-      }
-      else if (e.stringParam.startsWith("AP"))
-      {
-        if (lampState.wifiMode == LampWiFiMode::AP)
-          return;
+    case EventType::EFF_SET_SCALE:
+      effSets[lampState.effIndex].scale = e.int16Param;
+      break;
 
-        lampState.wifiMode = LampWiFiMode::AP;
-        evQ.post(Event::ev(EventType::WIFI_UPDATE));
-      }
+    case EventType::EFF_SET_SPEED:
+      effSets[lampState.effIndex].speed = e.int16Param;
       break;
 
     case EventType::WIFI_UPDATE:
@@ -104,6 +88,13 @@ public:
 
     effCtrl.update();
     wsCtrl.update();
+
+#ifdef USE_EEPROM
+    lampStateFD.update();
+    effSetsFD.update();
+#endif
+
+    DEBUGLN(lampState.toString());
   }
 
 private:

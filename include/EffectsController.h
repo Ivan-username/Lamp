@@ -16,9 +16,10 @@ public:
 
     void tick()
     {
-        if (timer.isReady() && lampState.power)
+
+        if (effTimer.isReady() && lampState.power)
         {
-            effs[lampState.effIndex]->routine(map(effSets[lampState.effIndex].scale, 0, 255, 1, 50));
+            effs[lampState.effIndex]->routine(map(effSets[lampState.effIndex].scale, 0, 255, 1, 70));
             FastLED.show();
             isClear = false;
         }
@@ -32,14 +33,16 @@ public:
 
     void init()
     {
-        timer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
+        effTimer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
         FastLED.setBrightness(map(effSets[lampState.effIndex].brightness, 0, 255, 1, 255));
         effs[lampState.effIndex]->reset();
+
+        animTimer.setInterval(33);
     }
 
     void update()
     {
-        timer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
+        effTimer.setInterval(map(effSets[lampState.effIndex].speed, 0, 255, 10, 100));
         FastLED.setBrightness(map(effSets[lampState.effIndex].brightness, 0, 255, 1, 255));
         effs[lampState.effIndex]->reset();
     }
@@ -48,5 +51,6 @@ private:
     bool isClear = false;
 
     Effect **effs;
-    Timer timer;
+    Timer effTimer;
+    Timer animTimer;
 };

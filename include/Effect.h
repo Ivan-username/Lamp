@@ -127,79 +127,53 @@ public:
 
   void routine(uint8_t scale) override
   {
-    uint8_t width = ledConfig.getWidth();
-    uint8_t height = ledConfig.getHeight();
+    const uint16_t w = ledConfig.getWidth();
+    const uint16_t h = ledConfig.getHeight();
 
-    // Высота пламени ≈ половина ширины
-    uint8_t fireHeight = min<uint8_t>(height, width / 2);
+    if (h <= 1)
+      return;
 
-    // Цвет пламени: от красного к оранжево-жёлтому
-    // Hue: 0 (красный) → ~32 (оранжевый)
-    uint8_t baseHue = map(scale, 1, 50, 0, 32);
+    // scale -> цветовое колесо (red -> red)
+    CHSV hsv(scale, 255, 255);
+    CRGB targetColor;
+    hsv2rgb_rainbow(hsv, targetColor);
 
-    // Масштаб шума (размер языков)
-    uint8_t noiseScale = 30;
+    const uint16_t mid = h / 2;
 
-    // Гасим всё
-    ledConfig.fillAll(CRGB::Black);
-
-    // Основное пламя
-    for (uint8_t y = 0; y < fireHeight; y++)
+    for (uint16_t y = 0; y < h; y++)
     {
-      for (uint8_t x = 0; x < width; x++)
+      CRGB rowColor;
+
+      if (y < mid)
       {
-        // Координаты в шумовом пространстве
-        uint16_t nx = x * noiseScale;
-        uint16_t ny = y * noiseScale;
+        // Белый -> target
+        uint8_t t = map(y, 0, mid - 1, 0, 255);
+        rowColor = blend(CRGB::White, targetColor, t);
+      }
+      else
+      {
+        // target -> чёрный
+        uint8_t t = map(y, mid, h - 1, 0, 255);
+        rowColor = blend(targetColor, CRGB::Black, t);
+      }
 
-        // Шум, текущий по времени
-        uint8_t n = inoise8(nx, ny + time);
-
-        // Усиливаем низ и гасим верх
-        uint8_t heat = qsub8(n, y * (255 / fireHeight));
-
-        if (heat < 20)
-          continue;
-
-        // Яркость и насыщенность
-        uint8_t bri = scale8(heat, 240);
-        uint8_t sat = 255;
-
-        // Немного гуляющий hue для живости
-        uint8_t hue = baseHue + scale8(heat, 10);
-
-        // Рисуем снизу вверх
-        uint8_t drawY = fireHeight - 1 - y;
-        ledConfig.setPixColorXY(x, drawY, CHSV(hue, sat, bri));
+      for (uint16_t x = 0; x < w; x++)
+      {
+        ledConfig.setPixColorXY(x, y, rowColor);
       }
     }
-
-    // ===== УГОЛЬКИ =====
-    if (random8() < 40)
-    {
-      uint8_t ex = random8(width);
-      uint8_t ey = fireHeight + random8(2);
-
-      if (ey < height)
-      {
-        ledConfig.setPixColorXY(
-            ex,
-            ey,
-            CHSV(baseHue + 10, 200, 255));
-      }
-    }
-
-    time += 2;
   }
 
   void reset() override
   {
-    time = 0;
-    ledConfig.fillAll(CRGB::Black);
   }
 
 private:
-  uint16_t time = 0;
+  inline uint8_t fcolor(uint8_t x)
+  {
+    uint16_t x2 = (uint16_t)x * x;
+    return (uint8_t)((x2 * x) >> 8);
+  }
 };
 
 // ============ GYVER FIRE EFFECT =============
