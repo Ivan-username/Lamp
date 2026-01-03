@@ -1,11 +1,10 @@
 #pragma once
 
-#include "config.h"
+#include <ESP8266WiFi.h>
+
 #include "EventQueue.h"
 #include "Timer.h"
 #include "LampState.h"
-
-#include <ESP8266WiFi.h>
 
 class WiFiController
 {

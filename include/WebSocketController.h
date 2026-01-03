@@ -1,11 +1,10 @@
 
 #pragma once
 
-#include "config.h"
+#include <WebSocketsServer.h>
+
 #include "EventQueue.h"
 #include "LampState.h"
-
-#include <WebSocketsServer.h>
 
 class WebSocketController
 {

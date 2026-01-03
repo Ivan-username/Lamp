@@ -1,7 +1,7 @@
 #pragma once
 
-#include "config.h"
-#include "WiFiController.h"
+#include <ESP8266WebServer.h>
+
 class HttpController
 {
 public:

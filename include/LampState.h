@@ -1,11 +1,9 @@
 #pragma once
 
-#include "config.h"
-#include <Arduino.h>
 #include <FileData.h>
 #include <LittleFS.h>
 
-#pragma once
+#include "config.h"
 
 constexpr size_t WIFI_SSID_LEN = 32;
 constexpr size_t WIFI_PASS_LEN = 64;

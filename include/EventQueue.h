@@ -1,6 +1,5 @@
 
 #pragma once
-#include <Arduino.h>
 
 enum class EventType : uint8_t
 {

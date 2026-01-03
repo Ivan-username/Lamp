@@ -1,13 +1,13 @@
 #pragma once
 
-#include <Arduino.h>
-#include <FastLED.h>
-#include <ESP8266WiFi.h>
-#include <WebSocketsServer.h>
-#include <ESP8266WebServer.h>
-#include <FileData.h>
-#include <LittleFS.h>
-#include <Button.h>
+// #include <Arduino.h>
+// #include <FastLED.h>
+// #include <ESP8266WiFi.h>
+// #include <WebSocketsServer.h>
+
+// #include <FileData.h>
+// #include <LittleFS.h>
+// #include <Button.h>
 
 // Service icons duaration (ms) configuration
 #define LOAD_SERV_ANIMATION 1000

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "config.h"
+#include <FastLED.h>
+
 #include "LedConfiguration.h"
 
 // these values are substracetd from the generated values to give a shape to the animation

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Arduino.h>
 #include <FastLED.h>
+
 #include "Timer.h"
 #include "Effect.h"
 #include "LampState.h"

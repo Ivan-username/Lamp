@@ -1,7 +1,5 @@
 #pragma once
 
-#include "config.h"
-
 #define CLICKS_TOUT 400
 #define BTN_HOLD 500
 #define BTN_DEBOUNCE 30
