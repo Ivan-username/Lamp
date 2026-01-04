@@ -2,6 +2,9 @@
 #include "EventQueue.h"
 #include "Button.h"
 #include "Timer.h"
+#include "LampState.h"
+
+#include "DEBUG.h"
 
 class ButtonController
 {
@@ -28,9 +31,20 @@ private:
   void handleClicks()
   {
     uint8_t c = btn.getClicks();
-    if (c)
+    switch (c)
     {
-      evQ.post(Event::evInt16(EventType::BUTTON_CLICK, c));
+    case 1:
+      evQ.post(Event::ev(EventType::POWER_CHANGE));
+      break;
+    case 2:
+      evQ.post(Event::evInt16(EventType::EFF_CHANGE, (lampState.effIndex + 1) % lampState.effAmount));
+      break;
+    case 3:
+      evQ.post(Event::evInt16(EventType::EFF_CHANGE, (lampState.effIndex + lampState.effAmount - 1) % lampState.effAmount));
+      break;
+    default:
+      DEBUGLN("ButtonController: unhandled clicks count: " + String(c));
+      break;
     }
   }
 
@@ -50,8 +64,8 @@ private:
       if (holdTimer.isReady())
       {
         evQ.post(Event::evInt16(
-            EventType::BUTTON_HOLD,
-            brightnessUp ? 5 : -5));
+            EventType::EFF_SET_BRIGHTNESS,
+            brightnessUp ? constrain(effSets[lampState.effIndex].brightness + 5, 1, 255) : constrain(effSets[lampState.effIndex].brightness - 5, 1, 255)));
       }
     }
     else

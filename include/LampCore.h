@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EffectsController.h"
+#include "LedViewController.h"
 #include "WebSocketController.h"
 #include "HttpController.h"
 #include "WiFiController.h"
@@ -14,15 +14,15 @@ class LampCore
 {
 public:
   LampCore(EventQueue &eventQueue,
-           EffectsController &effectsController,
+           LedViewController &ledViewController,
            WebSocketController &webSocketController,
            HttpController &httpController,
-           WiFiController &wiFiController)
+           WiFiController &wifiController)
       : evQ(eventQueue),
-        effCtrl(effectsController),
+        ledViewCtrl(ledViewController),
         wsCtrl(webSocketController),
         httpCtrl(httpController),
-        wifiCtrl(wiFiController) {}
+        wifiCtrl(wifiController) {}
 
   void init() {}
 
@@ -37,38 +37,38 @@ public:
   {
     switch (e.type)
     {
-      // ============ Button Events ============
-    case EventType::BUTTON_CLICK:
-      if (e.int16Param == 1)
-        lampState.power = !lampState.power;
-      if (e.int16Param == 2)
-        lampState.effIndex = (lampState.effIndex + 1) % lampState.effAmount;
-      else if (e.int16Param == 3)
-        lampState.effIndex = (lampState.effIndex + lampState.effAmount - 1) % lampState.effAmount;
-      break;
 
-    case EventType::BUTTON_HOLD:
-      effSets[lampState.effIndex].brightness = constrain(effSets[lampState.effIndex].brightness + e.int16Param, 1, 255);
-      break;
-
-    case EventType::POWER_CHANGE:
-      lampState.power = !lampState.power;
-      break;
-
-    case EventType::EFF_CHANGE:
-      lampState.effIndex = e.int16Param;
-      break;
-
+      // ============ EffSets Events ============
     case EventType::EFF_SET_BRIGHTNESS:
       effSets[lampState.effIndex].brightness = e.int16Param;
+      ledViewCtrl.setEffectSets();
+      updateEffSetsFD();
       break;
 
     case EventType::EFF_SET_SCALE:
       effSets[lampState.effIndex].scale = e.int16Param;
+      ledViewCtrl.setEffectSets();
+      updateEffSetsFD();
       break;
 
     case EventType::EFF_SET_SPEED:
       effSets[lampState.effIndex].speed = e.int16Param;
+      ledViewCtrl.setEffectSets();
+      updateEffSetsFD();
+      break;
+
+      // ============ LampState Events ============
+    case EventType::POWER_CHANGE:
+      lampState.power = !lampState.power;
+      if (lampState.power == false)
+        ledViewCtrl.clear();
+      updateLampStateFD();
+      break;
+
+    case EventType::EFF_CHANGE:
+      lampState.effIndex = e.int16Param;
+      ledViewCtrl.setEffect();
+      updateLampStateFD();
       break;
 
     case EventType::WIFI_UPDATE:
@@ -77,29 +77,36 @@ public:
       wifiCtrl.setWiFiMode(lampState.wifiMode);
       httpCtrl.init();
       wsCtrl.init();
-      break;
-
-    case EventType::HTTP_REQUEST:
+      updateLampStateFD();
       break;
 
     default:
+      DEBUGLN("Unhandled event type: " + String(static_cast<uint8_t>(e.type)));
       break;
     }
 
-    effCtrl.update();
     wsCtrl.update();
-
-#ifdef USE_EEPROM
-    lampStateFD.update();
-    effSetsFD.update();
-#endif
 
     DEBUGLN(lampState.toString());
   }
 
+#ifdef USE_EEPROM
+  void updateLampStateFD()
+  {
+    lampStateFD.update();
+  }
+  void updateEffSetsFD()
+  {
+    effSetsFD.update();
+  }
+#else
+  void updateLampStateFD() { return; }
+  void updateEffSetsFD() { return; }
+#endif
+
 private:
   EventQueue &evQ;
-  EffectsController &effCtrl;
+  LedViewController &ledViewCtrl;
   WebSocketController &wsCtrl;
   HttpController &httpCtrl;
   WiFiController &wifiCtrl;

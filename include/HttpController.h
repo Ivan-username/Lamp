@@ -46,8 +46,7 @@ private:
                        { handlePageComponents(); });
     }
 
-    void
-    handlePageComponents()
+    void handlePageComponents()
     {
         String path = _server.uri();
 

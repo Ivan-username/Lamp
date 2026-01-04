@@ -7,7 +7,7 @@
 #include "HttpController.h"
 #include "WebSocketController.h"
 #include "Effect.h"
-#include "EffectsController.h"
+#include "LedViewController.h"
 #include "EventQueue.h"
 #include "LampCore.h"
 #include "Button.h"
@@ -44,23 +44,22 @@ RainbowHorizontalEffect rainbowHorzEff(ledConfig);
 RainbowVerticalEffect rainbowVertEff(ledConfig);
 SnowfallEffect snowfallEffect(ledConfig);
 
-EffectsController effectsCtrl(effects);
+// Animation *animations[ANIMATIONS_AMOUNT];
+// Animation testAnim(ledConfig);
+// STAAnimation staAnim(ledConfig);
 
-Animation *animations[1];
-Animation testAnim(ledConfig);
+LedViewController ledViewCtrl(effects);
 
-LampCore core(eventQueue, effectsCtrl, webSocketCtrl, httpCtrl, wifiCtrl);
+LampCore core(eventQueue, ledViewCtrl, webSocketCtrl, httpCtrl, wifiCtrl);
 
 void setup()
 {
 
   effects[0] = &justLampEff;
   effects[1] = &gyverFireEff;
-  effects[2] = &rainbowHorzEff;
-  effects[3] = &rainbowVertEff;
+  effects[2] = &rainbowVertEff;
+  effects[3] = &rainbowHorzEff;
   effects[4] = &snowfallEffect;
-
-  animations[0] = &testAnim;
 
   Serial.begin(115200);
   delay(2000);
@@ -93,7 +92,7 @@ void setup()
   httpCtrl.init();
   webSocketCtrl.init();
 
-  effectsCtrl.init();
+  ledViewCtrl.init();
 
   core.init();
 }
@@ -112,7 +111,7 @@ void loop()
   lampBtn.tick();
 #endif
 
-  effectsCtrl.tick();
+  ledViewCtrl.tick();
 
   for (uint8_t i = 0; i < CORE_MESSAGES_PER_TICK; i++)
   {

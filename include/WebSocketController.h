@@ -22,6 +22,10 @@ public:
 
   void update()
   {
+
+    if (ws.connectedClients() == 0)
+      return;
+
     String message;
     message.reserve(140);
 

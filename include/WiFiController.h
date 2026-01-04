@@ -15,10 +15,7 @@ public:
 
     void tick()
     {
-        if (!checkTimer.isReady())
-            return;
-
-        if (lampState.wifiMode != LampWiFiMode::STA)
+        if (!checkTimer.isReady() || lampState.wifiMode == LampWiFiMode::AP)
             return;
 
         wl_status_t status = WiFi.status();
@@ -65,7 +62,7 @@ public:
 
     void init()
     {
-        setWiFiMode(lampState.wifiMode);
+        evQ.post(Event::ev(EventType::WIFI_UPDATE));
     }
 
     void setWiFiMode(LampWiFiMode mode)

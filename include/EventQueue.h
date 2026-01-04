@@ -19,6 +19,9 @@ enum class EventType : uint8_t
   EFF_SET_SPEED,
   EFF_SET_SCALE,
 
+  // Animation
+  ANIM_SHOW,
+
   // WiFi
   WIFI_CONNECTED,
   WIFI_DISCONNECTED,
@@ -35,7 +38,6 @@ struct Event
   int16_t int16Param = 0;
 
   const char *charsParam = nullptr;
-  String stringParam;
   void *ptr = nullptr;
 
   // factory methods
@@ -55,30 +57,38 @@ struct Event
     };
   }
 
-  static Event evStr(EventType t, const String &str)
+  static Event evChars(EventType t, const char *cstr)
   {
     return Event{
         .type = t,
-        .stringParam = str,
+        .charsParam = cstr,
     };
   }
 
-  static Event evInt16Str(EventType t, const int16_t &value, const String &str)
-  {
-    return Event{
-        .type = t,
-        .int16Param = value,
-        .stringParam = str,
-    };
-  }
+  // static Event evStr(EventType t, const String &str)
+  // {
+  //   return Event{
+  //       .type = t,
+  //       .stringParam = str,
+  //   };
+  // }
 
-  static Event evPtr(EventType t, void *p)
-  {
-    return Event{
-        .type = t,
-        .ptr = p,
-    };
-  }
+  // static Event evInt16Str(EventType t, const int16_t &value, const String &str)
+  // {
+  //   return Event{
+  //       .type = t,
+  //       .int16Param = value,
+  //       .stringParam = str,
+  //   };
+  // }
+
+  // static Event evPtr(EventType t, void *p)
+  // {
+  //   return Event{
+  //       .type = t,
+  //       .ptr = p,
+  //   };
+  // }
 };
 
 // ring buffer event queue

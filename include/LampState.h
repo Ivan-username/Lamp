@@ -96,8 +96,8 @@ public:
 
     wifiMode = LampWiFiMode::STA;
 
-    strncpy(ssidSTA, "keenetic", WIFI_SSID_LEN);
-    strncpy(passSTA, "12345678", WIFI_PASS_LEN);
+    strncpy(ssidSTA, "keenuka", WIFI_SSID_LEN);
+    strncpy(passSTA, "ZreTHEA44", WIFI_PASS_LEN);
     localIPSTA[0] = 1;
     localIPSTA[1] = 1;
     localIPSTA[2] = 1;
