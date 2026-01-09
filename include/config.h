@@ -1,28 +1,11 @@
 #pragma once
 
-// #include <Arduino.h>
-// #include <FastLED.h>
-// #include <ESP8266WiFi.h>
-// #include <WebSocketsServer.h>
-
-// #include <FileData.h>
-// #include <LittleFS.h>
-// #include <Button.h>
-
-// Service icons duaration (ms) configuration
-#define LOAD_SERV_ANIMATION 1000
-#define INFO_SERV_ANIMATION 300
-
 // Servers configuration
 #define HTTP_PORT 80
 #define WS_PORT 81
 
 // Core configuration
 #define CORE_MESSAGES_PER_TICK 8
-
-// Effect configuration
-#define EFFECTS_AMOUNT 5
-#define ANIMATIONS_AMOUNT 2
 
 // LED configuration
 #define LED_TYPE WS2812

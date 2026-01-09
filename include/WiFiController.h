@@ -49,6 +49,7 @@ public:
 
         if (tries > 0)
         {
+            evQ.post(Event::ev(EventType::WIFI_CONNECTING));
             tries--;
             return;
         }
@@ -62,10 +63,10 @@ public:
 
     void init()
     {
-        evQ.post(Event::ev(EventType::WIFI_UPDATE));
+        setWiFiMode();
     }
 
-    void setWiFiMode(LampWiFiMode mode)
+    void setWiFiMode()
     {
 
         // 2. disconnect STA

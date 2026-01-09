@@ -3,6 +3,8 @@
 #include <FileData.h>
 #include <LittleFS.h>
 
+#include "EffectData.h"
+
 #include "config.h"
 
 constexpr size_t WIFI_SSID_LEN = 32;
@@ -46,9 +48,7 @@ public:
     }
 
     result += F(", effect=");
-    result += effIndex;
-    result += '/';
-    result += (effAmount > 0 ? effAmount - 1 : 0);
+    result += static_cast<uint8_t>(effId);
 
     return result;
   }
@@ -70,8 +70,7 @@ public:
   uint8_t gatewayAP[4];
   uint8_t subnetAP[4];
 
-  uint8_t effAmount;
-  uint8_t effIndex;
+  EffectId effId;
 
   /* ==================== API ==================== */
   void setSTASSID(const char *ssid)
@@ -118,19 +117,10 @@ public:
     subnetAP[2] = 255;
     subnetAP[3] = 0;
 
-    effAmount = EFFECTS_AMOUNT;
-    effIndex = 0;
+    effId = EffectId::JUST_LAMP;
   }
 };
 
-struct EffSets
-{
-  uint8_t brightness = 30;
-  uint8_t scale = 30;
-  uint8_t speed = 30;
-};
-
-EffSets effSets[EFFECTS_AMOUNT];
 LampState lampState;
 
 FileData lampStateFD(
@@ -139,12 +129,4 @@ FileData lampStateFD(
     'L',
     &lampState,
     sizeof(lampState),
-    10000);
-
-FileData effSetsFD(
-    &LittleFS,
-    "/eff_sets.bin",
-    'S',
-    &effSets,
-    sizeof(effSets),
     10000);

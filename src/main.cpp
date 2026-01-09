@@ -1,31 +1,31 @@
 
 #include "config.h"
 
-#include <FileData.h>
-
 #include "WiFiController.h"
 #include "HttpController.h"
 #include "WebSocketController.h"
 #include "Effect.h"
-#include "LedViewController.h"
+#include "EffectData.h"
+#include "EffectManager.h"
 #include "EventQueue.h"
 #include "LampCore.h"
 #include "Button.h"
 #include "ButtonController.h"
 #include "LedConfiguration.h"
 #include "LampState.h"
-#include "Animation.h"
+#include "Ring.h"
+#include "LedViewer.h"
 
 CRGB leds[LED_AMOUNT];
 
 EventQueue eventQueue;
 
-ButtonController lampBtn(eventQueue, BTN_PIN, false);
+ButtonController buttonCtrl(eventQueue, BTN_PIN, false);
 
 WiFiController wifiCtrl(eventQueue);
 
 HttpController httpCtrl(HTTP_PORT);
-WebSocketController webSocketCtrl(eventQueue, WS_PORT);
+WebSocketController wsCtrl(eventQueue, WS_PORT);
 
 #if MATRIX_TYPE == 2
 DoublePanelSnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
@@ -35,34 +35,55 @@ SnakeMatrix ledConfig(leds, WIDTH, HEIGHT);
 RowMatrix ledConfig(leds, WIDTH, HEIGHT);
 #endif
 
-Effect *effects[EFFECTS_AMOUNT];
-Effect testDot(ledConfig);
-JustLampEffect justLampEff(ledConfig);
-// FireNoiseEffect fireNoiseEffect(ledConfig);
-GyverFireEffect gyverFireEff(ledConfig);
-RainbowHorizontalEffect rainbowHorzEff(ledConfig);
-RainbowVerticalEffect rainbowVertEff(ledConfig);
-SnowfallEffect snowfallEffect(ledConfig);
+uint8_t masterBrightness = 255;
+Effect *effects[static_cast<uint8_t>(EffectId::COUNT)];
+JustLampEffect justLamp(ledConfig, effSets[static_cast<uint8_t>(EffectId::JUST_LAMP)], masterBrightness);
+RainbowHorizontalEffect rainbowH(ledConfig, effSets[static_cast<uint8_t>(EffectId::RAINBOW_HORIZONTAL)], masterBrightness);
+RainbowVerticalEffect rainbowV(ledConfig, effSets[static_cast<uint8_t>(EffectId::RAINBOW_VERTICAL)], masterBrightness);
 
-// Animation *animations[ANIMATIONS_AMOUNT];
-// Animation testAnim(ledConfig);
-// STAAnimation staAnim(ledConfig);
+Ring ring(ledConfig);
 
-LedViewController ledViewCtrl(effects);
+EffectManager effManager(effects);
 
-LampCore core(eventQueue, ledViewCtrl, webSocketCtrl, httpCtrl, wifiCtrl);
+LedViewer ledViewer(effManager, ring);
+
+LampCore core(eventQueue, effManager, wsCtrl, httpCtrl, wifiCtrl, ledViewer);
+
+void showFiles(const String &path, uint8_t level = 0)
+{
+  Dir dir = LittleFS.openDir(path);
+
+  while (dir.next())
+  {
+    // отступы
+    for (uint8_t i = 0; i < level; i++)
+      Serial.print("  ");
+
+    String name = dir.fileName();
+
+    if (dir.isDirectory())
+    {
+      Serial.printf("[DIR]  %s\n", name.c_str());
+      showFiles(name, level + 1); // ВАЖНО: передаём name, а не path + name
+    }
+    else
+    {
+      Serial.printf("[FILE] %s (%d bytes)\n",
+                    name.c_str(),
+                    dir.fileSize());
+    }
+  }
+}
 
 void setup()
 {
 
-  effects[0] = &justLampEff;
-  effects[1] = &gyverFireEff;
-  effects[2] = &rainbowVertEff;
-  effects[3] = &rainbowHorzEff;
-  effects[4] = &snowfallEffect;
-
   Serial.begin(115200);
   delay(2000);
+
+  effects[static_cast<uint8_t>(EffectId::JUST_LAMP)] = &justLamp;
+  effects[static_cast<uint8_t>(EffectId::RAINBOW_HORIZONTAL)] = &rainbowH;
+  effects[static_cast<uint8_t>(EffectId::RAINBOW_VERTICAL)] = &rainbowV;
 
   LittleFS.begin();
 
@@ -71,54 +92,40 @@ void setup()
   effSetsFD.read();
 #endif
 
-  Dir dir = LittleFS.openDir("/");
-  while (dir.next())
-  {
-    Serial.printf("FILE: %s (%d bytes)\n",
-                  dir.fileName().c_str(),
-                  dir.fileSize());
-  }
+#ifdef DEBUG_SERIAL_LAMP
+  showFiles("/");
+#endif
 
   // LED setup
   FastLED.addLeds<LED_TYPE, LED_PIN, LED_COL_ORDER>(leds, LED_AMOUNT);
-  FastLED.setBrightness(0);
+  FastLED.setBrightness(255);
   FastLED.clear(true);
-
-  // Check led buffers pointers
-  Serial.println((uint32_t)leds, HEX);
-  Serial.println((uint32_t)ledConfig._leds, HEX);
 
   wifiCtrl.init();
   httpCtrl.init();
-  webSocketCtrl.init();
-
-  ledViewCtrl.init();
-
-  core.init();
+  wsCtrl.init();
+  effManager.setEffect();
 }
 
 void loop()
 {
 
   wifiCtrl.tick();
-  yield();
 
   httpCtrl.tick();
-  webSocketCtrl.tick();
-  yield();
+  wsCtrl.tick();
 
 #ifdef USE_BTN
-  lampBtn.tick();
+  buttonCtrl.tick();
 #endif
 
-  ledViewCtrl.tick();
+  ledViewer.tick();
+  yield();
 
-  for (uint8_t i = 0; i < CORE_MESSAGES_PER_TICK; i++)
-  {
-    core.tick();
-  }
 #ifdef USE_EEPROM
   if (lampStateFD.tick() == FD_WRITE || effSetsFD.tick() == FD_WRITE)
     DEBUGLN("EEPROM UPDATED");
 #endif
+
+  core.tick();
 }

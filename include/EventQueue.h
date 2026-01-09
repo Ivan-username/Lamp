@@ -5,31 +5,19 @@ enum class EventType : uint8_t
 {
   NONE = 0,
 
-  // Button
-  BUTTON_CLICK,
-  BUTTON_HOLD,
-  BUTTON_HOLD_END,
-
   POWER_CHANGE,
 
   // Effects
   EFF_CHANGE,
   EFF_SET_BRIGHTNESS,
-  EFF_CHANGE_BRIGHTNESS,
   EFF_SET_SPEED,
   EFF_SET_SCALE,
 
-  // Animation
-  ANIM_SHOW,
-
   // WiFi
   WIFI_CONNECTED,
+  WIFI_CONNECTING,
   WIFI_DISCONNECTED,
   WIFI_UPDATE,
-
-  // WebSocket / HTTP
-  WS_MESSAGE,
-  HTTP_REQUEST
 };
 
 struct Event
@@ -65,30 +53,13 @@ struct Event
     };
   }
 
-  // static Event evStr(EventType t, const String &str)
-  // {
-  //   return Event{
-  //       .type = t,
-  //       .stringParam = str,
-  //   };
-  // }
-
-  // static Event evInt16Str(EventType t, const int16_t &value, const String &str)
-  // {
-  //   return Event{
-  //       .type = t,
-  //       .int16Param = value,
-  //       .stringParam = str,
-  //   };
-  // }
-
-  // static Event evPtr(EventType t, void *p)
-  // {
-  //   return Event{
-  //       .type = t,
-  //       .ptr = p,
-  //   };
-  // }
+  static Event evPtr(EventType t, void *p)
+  {
+    return Event{
+        .type = t,
+        .ptr = p,
+    };
+  }
 };
 
 // ring buffer event queue

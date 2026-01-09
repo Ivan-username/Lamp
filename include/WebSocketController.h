@@ -5,6 +5,7 @@
 
 #include "EventQueue.h"
 #include "LampState.h"
+#include "EffectData.h"
 
 class WebSocketController
 {
@@ -20,7 +21,7 @@ public:
 
   void tick() { ws.loop(); }
 
-  void update()
+  void broadcast()
   {
 
     if (ws.connectedClients() == 0)
@@ -41,15 +42,15 @@ public:
     message += F("|");
 
     message += F("BRIGHT:");
-    message += effSets[lampState.effIndex].brightness;
+    message += effSets[static_cast<uint8_t>(lampState.effId)].brightness;
     message += F("|");
 
     message += F("SCALE:");
-    message += effSets[lampState.effIndex].scale;
+    message += effSets[static_cast<uint8_t>(lampState.effId)].scale;
     message += F("|");
 
     message += F("SPEED:");
-    message += effSets[lampState.effIndex].speed;
+    message += effSets[static_cast<uint8_t>(lampState.effId)].speed;
     message += F("|");
 
     message += F("SAVED_STA:");
@@ -100,7 +101,7 @@ private:
   }
   virtual void onConnect(uint8_t clientId, IPAddress ip)
   {
-    update();
+    broadcast();
   }
 
   virtual void onDisconnect(uint8_t clientId)
@@ -116,13 +117,13 @@ private:
     if (message.startsWith("POWER"))
       evQ.post(Event::ev(EventType::POWER_CHANGE));
     else if (message.startsWith("EFFECT:"))
-      evQ.post(Event::evInt16(EventType::EFF_CHANGE, constrain(message.substring(7).toInt(), 0, lampState.effAmount - 1)));
+      evQ.post(Event::evInt16(EventType::EFF_CHANGE, message.substring(7).toInt()));
     else if (message.startsWith("BRIGHT:"))
-      evQ.post(Event::evInt16(EventType::EFF_SET_BRIGHTNESS, constrain(message.substring(7).toInt(), 1, 255)));
+      evQ.post(Event::evInt16(EventType::EFF_SET_BRIGHTNESS, message.substring(7).toInt()));
     else if (message.startsWith("SCALE:"))
-      evQ.post(Event::evInt16(EventType::EFF_SET_SCALE, constrain(message.substring(6).toInt(), 1, 255)));
+      evQ.post(Event::evInt16(EventType::EFF_SET_SCALE, message.substring(6).toInt()));
     else if (message.startsWith("SPEED:"))
-      evQ.post(Event::evInt16(EventType::EFF_SET_SPEED, constrain(message.substring(6).toInt(), 10, 255)));
+      evQ.post(Event::evInt16(EventType::EFF_SET_SPEED, message.substring(6).toInt()));
     else if (message.startsWith("STA:"))
     {
       if (lampState.wifiMode == LampWiFiMode::STA)
